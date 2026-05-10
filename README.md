@@ -1,4 +1,4 @@
-## 📄 Sections
+##  Sections
 
 - Hero — headline, email subscription form with validation, and privacy note
 - Features — Custom Designs, Fresh Ingredients, Fast Delivery, Satisfaction Guaranteed
@@ -8,7 +8,7 @@
 
 ---
 
-## ⚙️ JavaScript Features
+## JavaScript Features
 
 - Email validation with toast notifications
 - Scroll reveal animations on all cards
@@ -19,7 +19,7 @@
 
 ---
 
-## 🧠 What I Learned
+## What I Learned
 
 This project was built while i was teaching myself JavaScript. The key concepts I practised:
 
@@ -32,11 +32,11 @@ This project was built while i was teaching myself JavaScript. The key concepts 
 No installs. No build step.
 
 
-## 🛠️ Built With
+##  Built With
 
 - HTML5, CSS3, Vanilla JavaScript
 - Google Fonts — Poppins
 - Images — Pinterest & Pixabay
 
 
-> Made with ❤️ and butter in Nairobi 🇰🇪
+> Made with love and butter in Nairobi 🇰🇪
