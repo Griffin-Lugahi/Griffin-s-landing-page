@@ -87,40 +87,137 @@ navLinks.forEach(link => {
 });
 
 
-// CART — with item tracking
-const cartCount = document.getElementById('cart-count');
-const cart = {};   // { name: { price, qty } }
 
+// CART + ORDER MODAL
+const cartCount   = document.getElementById('cart-count');
+const overlay     = document.getElementById('modal-overlay');
+const step1       = document.getElementById('modal-step-1');
+const step2       = document.getElementById('modal-step-2');
+const modalTitle  = document.getElementById('modal-title');
+const modalPrice  = document.getElementById('modal-price');
+const modalBadge  = document.getElementById('modal-badge');
+
+const cart = {};
+let pendingItem = null;
+
+// Minimum delivery date = tomorrow
+function setMinDate() {
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('order-date').min = tomorrow.toISOString().split('T')[0];
+}
+
+function openModal(name, price) {
+  pendingItem = { name, price };
+  modalTitle.textContent  = name;
+  modalPrice.textContent  = `$${price}`;
+  step1.classList.remove('hidden');
+  step2.classList.add('hidden');
+  clearErrors();
+  document.getElementById('order-name').value    = '';
+  document.getElementById('order-phone').value   = '';
+  document.getElementById('order-address').value = '';
+  document.getElementById('order-date').value    = '';
+  document.getElementById('order-notes').value   = '';
+  setMinDate();
+  overlay.classList.add('open');
+  setTimeout(() => document.getElementById('order-name').focus(), 250);
+}
+
+function closeModal() {
+  overlay.classList.remove('open');
+  pendingItem = null;
+}
+
+function clearErrors() {
+  ['name','phone','address','date'].forEach(f => {
+    document.getElementById(`err-${f}`).textContent = '';
+    document.getElementById(`order-${f}`).classList.remove('invalid');
+  });
+}
+
+function setError(field, msg) {
+  document.getElementById(`err-${field}`).textContent = msg;
+  document.getElementById(`order-${field}`).classList.add('invalid');
+}
+
+function validateForm() {
+  clearErrors();
+  let valid = true;
+  const name    = document.getElementById('order-name').value.trim();
+  const phone   = document.getElementById('order-phone').value.trim();
+  const address = document.getElementById('order-address').value.trim();
+  const date    = document.getElementById('order-date').value;
+
+  if (!name)                          { setError('name', 'Please enter your full name.'); valid = false; }
+  if (!phone)                         { setError('phone', 'Please enter a phone number.'); valid = false; }
+  else if (!/^[\d\s\+\-\(\)]{7,}$/.test(phone)) { setError('phone', 'Enter a valid phone number.'); valid = false; }
+  if (!address)                       { setError('address', 'Please enter a delivery address.'); valid = false; }
+  if (!date)                          { setError('date', 'Please choose a delivery date.'); valid = false; }
+  return valid;
+}
+
+// Order Now buttons → open modal
 document.querySelectorAll('.order-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    const name  = btn.dataset.name;
-    const price = parseInt(btn.dataset.price);
-
-    if (cart[name]) {
-      cart[name].qty++;
-    } else {
-      cart[name] = { price, qty: 1 };
-    }
-
-    const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
-    cartCount.textContent = total;
-
-    cartCount.classList.remove('bump');
-    void cartCount.offsetWidth;
-    cartCount.classList.add('bump');
-    setTimeout(() => cartCount.classList.remove('bump'), 300);
-
-    showToast(`🛒 "${name}" ($${price}) added to cart!`);
-
-    // pulse the WhatsApp button when cart has items
-    const wa = document.getElementById('whatsapp-btn');
-    if (wa) wa.classList.add('has-items');
+    openModal(btn.dataset.name, parseInt(btn.dataset.price));
   });
 });
 
+// Submit form
+document.getElementById('modal-submit').addEventListener('click', () => {
+  if (!validateForm()) return;
+
+  const name    = document.getElementById('order-name').value.trim();
+  const phone   = document.getElementById('order-phone').value.trim();
+  const address = document.getElementById('order-address').value.trim();
+  const date    = new Date(document.getElementById('order-date').value + 'T00:00:00');
+  const notes   = document.getElementById('order-notes').value.trim();
+  const dateStr = date.toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // Add to cart tracking
+  const { name: itemName, price } = pendingItem;
+  if (cart[itemName]) cart[itemName].qty++;
+  else cart[itemName] = { price, qty: 1 };
+
+  const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+  cartCount.textContent = total;
+  cartCount.classList.remove('bump');
+  void cartCount.offsetWidth;
+  cartCount.classList.add('bump');
+  setTimeout(() => cartCount.classList.remove('bump'), 300);
+
+  // Build confirmation
+  const rows = [
+    ['Cake',     itemName],
+    ['Price',    `$${price}`],
+    ['Name',     name],
+    ['Phone',    phone],
+    ['Delivery', address],
+    ['Date',     dateStr],
+  ];
+  if (notes) rows.push(['Notes', notes]);
+
+  document.getElementById('confirm-details').innerHTML = rows
+    .map(([k, v]) => `<div class="confirm-row"><span>${k}</span><span>${v}</span></div>`)
+    .join('');
+
+  step1.classList.add('hidden');
+  step2.classList.remove('hidden');
+});
+
+// Close triggers
+document.getElementById('modal-close').addEventListener('click', closeModal);
+document.getElementById('modal-done').addEventListener('click', () => {
+  closeModal();
+  showToast(`🎉 Order for "${pendingItem?.name ?? 'your cake'}" confirmed!`);
+});
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
 
 // WHATSAPP BUTTON
-const WA_NUMBER = '254114593974'; 
+const WA_NUMBER = '254114593974';
 
 function buildWhatsAppMessage() {
   const items = Object.entries(cart);
@@ -147,7 +244,6 @@ document.getElementById('whatsapp-btn').addEventListener('click', () => {
   const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
 });
-
 
 // STICKY HEADER
 const header = document.getElementById('header');
