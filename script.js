@@ -87,23 +87,65 @@ navLinks.forEach(link => {
 });
 
 
-// CART COUNTER
+// CART — with item tracking
 const cartCount = document.getElementById('cart-count');
-let cartTotal = 0;
+const cart = {};   // { name: { price, qty } }
 
 document.querySelectorAll('.order-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    cartTotal++;
-    cartCount.textContent = cartTotal;
+    const name  = btn.dataset.name;
+    const price = parseInt(btn.dataset.price);
 
-    // Bump animation
+    if (cart[name]) {
+      cart[name].qty++;
+    } else {
+      cart[name] = { price, qty: 1 };
+    }
+
+    const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
+    cartCount.textContent = total;
+
     cartCount.classList.remove('bump');
-    void cartCount.offsetWidth; // force reflow
+    void cartCount.offsetWidth;
     cartCount.classList.add('bump');
     setTimeout(() => cartCount.classList.remove('bump'), 300);
 
-    showToast(`🛒 "${btn.dataset.name}" ($${btn.dataset.price}) added to cart!`);
+    showToast(`🛒 "${name}" ($${price}) added to cart!`);
+
+    // pulse the WhatsApp button when cart has items
+    const wa = document.getElementById('whatsapp-btn');
+    if (wa) wa.classList.add('has-items');
   });
+});
+
+
+// WHATSAPP BUTTON
+const WA_NUMBER = '254114593974'; 
+
+function buildWhatsAppMessage() {
+  const items = Object.entries(cart);
+  if (items.length === 0) {
+    return "Hi SweetBite! I'd like to enquire about your cakes.";
+  }
+
+  let msg = "Hi SweetBite! I'd like to place an order:\n\n";
+  let total = 0;
+
+  items.forEach(([name, { price, qty }]) => {
+    const subtotal = price * qty;
+    total += subtotal;
+    msg += `• ${name} x${qty} — $${subtotal}\n`;
+  });
+
+  msg += `\n*Total: $${total}*`;
+  msg += "\n\nPlease confirm availability and delivery details. Thank you!";
+  return msg;
+}
+
+document.getElementById('whatsapp-btn').addEventListener('click', () => {
+  const msg = buildWhatsAppMessage();
+  const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
 });
 
 
