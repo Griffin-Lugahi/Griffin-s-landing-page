@@ -256,6 +256,69 @@ alt="Chocolate Dream cake">
   </svg>
   <span id="wa-badge"></span>
 </a>
+
+<div id="modal-overlay">
+  <div id="order-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <button id="modal-close" aria-label="Close">&times;</button>
+
+    <!-- STEP 1: Form -->
+    <div id="modal-step-1">
+      <div class="modal-header">
+        <div class="modal-cake-badge" id="modal-badge">🎂</div>
+        <div>
+          <p class="modal-eyebrow">You're ordering</p>
+          <h2 id="modal-title" class="modal-cake-name">Chocolate Dream</h2>
+          <p class="modal-cake-price" id="modal-price">$100</p>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="field-group">
+          <label for="order-name">Full name</label>
+          <input type="text" id="order-name" placeholder="e.g. Amara Osei" autocomplete="name" />
+          <span class="field-error" id="err-name"></span>
+        </div>
+        <div class="field-group">
+          <label for="order-phone">Phone number</label>
+          <input type="tel" id="order-phone" placeholder="e.g. 0712 345 678" autocomplete="tel" />
+          <span class="field-error" id="err-phone"></span>
+        </div>
+        <div class="field-group">
+          <label for="order-address">Delivery address</label>
+          <input type="text" id="order-address" placeholder="e.g. Westlands, Nairobi" autocomplete="street-address" />
+          <span class="field-error" id="err-address"></span>
+        </div>
+        <div class="field-group">
+          <label for="order-date">Delivery date</label>
+          <input type="date" id="order-date" />
+          <span class="field-error" id="err-date"></span>
+        </div>
+        <div class="field-group">
+          <label for="order-notes">Special instructions <span class="optional">(optional)</span></label>
+          <input type="text" id="order-notes" placeholder="e.g. Write Happy Birthday on top" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="modal-submit" class="btn-primary">Confirm Order 🎉</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Confirmation -->
+    <div id="modal-step-2" class="hidden">
+      <div class="confirm-icon">✅</div>
+      <h2 class="confirm-title">Order placed!</h2>
+      <p class="confirm-sub">Here's your order summary</p>
+
+      <div class="confirm-details" id="confirm-details"></div>
+
+      <div class="modal-footer">
+        <button id="modal-done" class="btn-primary">Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
   <script src="script.js"></script>
 </body>
 </html>
