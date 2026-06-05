@@ -35,7 +35,7 @@ function isValidEmail(email) {
 
 
 // SCROLL REVEAL 
-const revealEls = document.querySelectorAll('.feature, .price-card, .testi-card');
+const revealEls = document.querySelectorAll('.feature, .price-card, .testi-card, .about-block, .stat-card');
 
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
