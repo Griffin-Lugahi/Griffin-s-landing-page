@@ -1,4 +1,3 @@
-/* VARIABLES */
 :root {
   --primary:    #d2691e;
   --primary-dk: #a0522d;
@@ -34,8 +33,7 @@ body {
 
 img { display: block; max-width: 100%; }
 
-/* TOAST */
-   
+/* TOAST*/
 #toast {
   position: fixed;
   bottom: 28px;
@@ -56,7 +54,7 @@ img { display: block; max-width: 100%; }
 #toast.show  { opacity: 1; transform: translateX(-50%) translateY(0); }
 #toast.error { background: #c0392b; }
 
-/*  HEADER */
+/* HEADER */
 #header {
   position: fixed;
   top: 0;
@@ -169,7 +167,7 @@ img { display: block; max-width: 100%; }
 #hamburger.open span:nth-child(2) { opacity: 0; }
 #hamburger.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
-/*  HERO SECTION  */
+/* HERO */
 #hero {
   min-height: 100vh;
   display: flex;
@@ -255,7 +253,49 @@ img { display: block; max-width: 100%; }
   opacity: 0.6;
 }
 
-/* SHARED SECTION STYLES */
+/* WHATSAPP BUTTON */
+#whatsapp-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  z-index: 1100;
+  transition: transform 0.2s, background 0.2s;
+}
+#whatsapp-btn:hover {
+  background: #1ebe5d;
+  transform: scale(1.1);
+}
+#whatsapp-btn.has-items {
+  animation: wa-pulse 2s infinite;
+}
+#wa-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: none;
+}
+#whatsapp-btn.has-items #wa-badge {
+  display: block;
+}
+@keyframes wa-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.08); }
+}
+/*SHARED SECTION STYLES */
 section {
   padding: 90px 24px;
 }
@@ -529,7 +569,7 @@ section {
   margin: 0;
 }
 
-/*  FOOTER */
+/* FOOTER */
 footer {
   background: var(--primary);
   padding: 36px 24px;
