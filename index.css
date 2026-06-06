@@ -1,425 +1,1116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SweetBite Cakes</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="index.css">
-</head>
-<body>
+:root {
+  --primary:    #d2691e;
+  --primary-dk: #a0522d;
+  --secondary:  #5c2a00;
+  --accent:     #ff7f50;
+  --bg:         #fff8f4;
+  --bg-alt:     #fff0e5;
+  --card-bg:    #ffffff;
+  --text:       #333333;
+  --text-muted: #888888;
+  --radius:     14px;
+  --radius-sm:  8px;
+  --shadow:     0 4px 20px rgba(0,0,0,0.08);
+  --shadow-hov: 0 10px 30px rgba(0,0,0,0.14);
+  --transition: 0.3s ease;
+}
 
-  <div id="toast"></div>
+/* RESET & BASE */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  <header id="header">
-    <div class="logo">
-      <img id="header-img" src="https://cdn-icons-png.flaticon.com/512/2909/2909764.png" alt="SweetBite logo" />
-      <span class="logo-text">SweetBite</span>
-    </div>
-    <nav id="nav-bar">
-      <ul>
-        <li><a class="nav-link" href="#features">Features</a></li>
-        <li><a class="nav-link" href="#pricing">Our Cakes</a></li>
-        <li><a class="nav-link" href="#testimonials">Reviews</a></li>
-        <li><a class="nav-link" href="#about">About Us</a></li>
-        
-      </ul>
-    </nav>
-    <div class="header-actions">
-      <button id="cart-btn" aria-label="View cart">
-        🛒 Cart <span id="cart-count">0</span>
-      </button>
-      
-      <button id="theme-toggle" aria-label="Toggle dark mode">
-  <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-  </svg>
-  <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"
-       style="display:none">
-    <circle cx="12" cy="12" r="5"/>
-    <line x1="12" y1="1"  x2="12" y2="3"/>
-    <line x1="12" y1="21" x2="12" y2="23"/>
-    <line x1="4.22" y1="4.22"  x2="5.64" y2="5.64"/>
-    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-    <line x1="1"  y1="12" x2="3"  y2="12"/>
-    <line x1="21" y1="12" x2="23" y2="12"/>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-  </svg>
-</button>
+html { scroll-behavior: smooth; }
 
-      <button id="hamburger" aria-label="Toggle menu">
-        <span></span><span></span><span></span>
-      </button>
-    </div>
-  </header>
+body {
+  font-family: "Poppins", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
 
-  <section id="hero">
-    <div class="hero-content">
-      <span class="hero-badge">🏆 Nairobi's #1 Custom Cake Shop</span>
-      <h1>Delight in<br>Every Bite 🍰</h1>
-      <p>Freshly baked cakes crafted with love, premium ingredients, and delivered right to your door.</p>
-      <form id="form">
-        <input type="email" id="email" placeholder="Enter your email for sweet offers" required />
-        <button type="submit" id="submit">Get Offers</button>
-      </form>
-      <p class="hero-note">🔒 No spam, unsubscribe anytime.</p>
-    </div>
-  </section>
+img { display: block; max-width: 100%; }
 
-  <section id="features">
-    <div class="section-header">
-      <h2>Why Choose SweetBite</h2>
-      <p>We don't just bake cakes — we create memories</p>
-    </div>
-    <div class="feature-container">
-      <div class="feature">
-        <div class="feature-icon">🎂</div>
-        <h3>Custom Designs</h3>
-        <p>We craft cakes for birthdays, weddings, and every celebration — exactly how you imagine them.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🧁</div>
-        <h3>Fresh Ingredients</h3>
-        <p>Only the best — locally sourced butter, farm-fresh eggs, and premium Belgian chocolate.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">🚚</div>
-        <h3>Fast Delivery</h3>
-        <p>Fresh from our oven to your door, right on time. Available across Nairobi daily.</p>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">💯</div>
-        <h3>Satisfaction Guaranteed</h3>
-        <p>Not happy? We'll remake it or refund it — no questions asked.</p>
-      </div>
-    </div>
-  </section>
+/* TOAST*/
+#toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--secondary);
+  color: #fff;
+  padding: 13px 26px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 0.35s, transform 0.35s;
+}
+#toast.show  { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.error { background: #c0392b; }
 
-  <section id="pricing">
-    <div class="section-header">
-      <h2>Our Cake Collection</h2>
-      <p>Handcrafted for every occasion — order your favourite today</p>
-    </div>
+/* HEADER */
+#header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(255, 248, 244, 0.96);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 48px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  z-index: 1000;
+  border-bottom-left-radius: var(--radius);
+  border-bottom-right-radius: var(--radius);
+  backdrop-filter: blur(6px);
+  transition: background var(--transition), box-shadow var(--transition);
+}
 
-    <div class="pricing-container">
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#header-img { width: 42px; }
+.logo-text {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: -0.3px;
+}
 
-      <div class="price-card">
-        <div class="card-img-wrap">
-          <span class="badge popular">Popular</span>
-          <img class="chocolate"
-src="https://i.pinimg.com/474x/1c/11/a9/1c11a988850690944de241f93e63290c.jpg"
-width="640"
-alt="Chocolate Dream cake">
-        </div>
+#nav-bar ul {
+  display: flex;
+  list-style: none;
+  gap: 6px;
+}
+.nav-link {
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 7px 14px;
+  border-radius: 30px;
+  transition: var(--transition);
+}
+.nav-link:hover,
+.nav-link.active {
+  background: var(--accent);
+  color: #fff;
+}
 
-        <div class="card-body">
-          <span class="cake-tag">Chocolate</span>
-          <h3>Chocolate Dream</h3>
-          <p class="cake-desc">Rich Belgian chocolate layers with silky ganache frosting.</p>
-          <div class="card-footer">
-            <span class="cake-price">$100</span>
-            <button class="order-btn" data-name="Chocolate Dream" data-price="100">Order Now</button>
-          </div>
-        </div>
-      </div>
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-      <div class="price-card">
-        <div class="card-img-wrap">
-          <img src="https://cdn.pixabay.com/photo/2017/01/11/11/33/cake-1971552_640.jpg" alt="Strawberry Bliss cake"/>
-        </div>
-        <div class="card-body">
-          <span class="cake-tag">Fruity</span>
-          <h3>Strawberry Bliss</h3>
-          <p class="cake-desc">Fresh strawberries layered on a light vanilla cream sponge.</p>
-          <div class="card-footer">
-            <span class="cake-price">$30</span>
-            <button class="order-btn" data-name="Strawberry Bliss" data-price="30">Order Now</button>
-          </div>
-        </div>
-      </div>
+#cart-btn {
+  background: none;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 7px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: var(--transition);
+}
+#cart-btn:hover {
+  background: var(--primary);
+  color: #fff;
+}
+#cart-count {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  transition: transform 0.2s;
+}
+#cart-count.bump { transform: scale(1.5); }
 
-      <div class="price-card">
-        <div class="card-img-wrap">
-          <span class="badge new-badge">New</span>
-          <img src="https://i.pinimg.com/736x/5e/93/df/5e93df17e4d5dcd1af9d37521276d680.jpg" 
-  width="100" alt="Lemon Velvet cake"/>
-        </div>
-        <div class="card-body">
-                     
-          <span class="cake-tag">Citrus</span>
-          <h3>Lemon Velvet</h3>
-  
-          <p class="cake-desc">Tangy lemon curd folded into a buttery velvet crumb.</p>
-          <div class="card-footer">
-            <span class="cake-price">$28</span>
-            <button class="order-btn" data-name="Lemon Velvet" data-price="28">Order Now</button>
-  
-          </div>
-        </div>
-      </div>
+/* DARK MODE VARIABLES */
+body.dark {
+  --bg:         #1a1008;
+  --bg-alt:     #221508;
+  --card-bg:    #2a1a0e;
+  --text:       #f0e6d8;
+  --text-muted: #a08060;
+  --shadow:     0 4px 20px rgba(0,0,0,0.35);
+  --shadow-hov: 0 10px 30px rgba(0,0,0,0.5);
+}
 
-      <div class="price-card">
-        <div class="card-img-wrap">
-          <img 
-  src="https://i.pinimg.com/474x/bb/d8/d4/bbd8d4bab2dc0474c4777eb36f579798.jpg" 
-  width="300"
-  alt="wedding deluxe cake">
-        </div>
-        <div class="card-body">
-          <span class="cake-tag">Premium</span>
-          <h3>Wedding Deluxe</h3>
-          <p class="cake-desc">A stunning three-tier masterpiece for your special day.</p>
-          <div class="card-footer">
-            <span class="cake-price">$100</span>
-            <button class="order-btn" data-name="Wedding Deluxe" data-price="100">Order Now</button>
-          </div>
-        </div>
-      </div>
+body.dark #header {
+  background: rgba(26, 16, 8, 0.96);
+}
 
-      <div class="price-card">
-        <div class="card-img-wrap">
-          <img src="https://i.pinimg.com/236x/9d/38/56/9d3856c7b0d363998842f608f0da7a5a.jpg"
-          width="300"
-          alt="Red Velvet cake"/>
-        </div>
-        <div class="card-body">
-          <span class="cake-tag">Classic</span>
-          <h3>Red Velvet</h3>
-          <p class="cake-desc">Classic red velvet with rich cream cheese frosting.</p>
-          <div class="card-footer">
-            <span class="cake-price">$32</span>
-            <button class="order-btn" data-name="Red Velvet" data-price="32">Order Now</button>
-          </div>
-        </div>
-      </div>
+body.dark .field-group input {
+  background: #1a1008;
+  border-color: #4a2e10;
+  color: var(--text);
+}
 
-      <div class="price-card">
-        <div class="card-img-wrap">
-          <span class="badge new-badge">New</span>
-          <img src="https://i.pinimg.com/236x/7e/8a/e8/7e8ae81a7e449b9354ecd6e3ff6366f9.jpg" alt="Caramel Crunch cake"/>
-        </div>
-        <div class="card-body">
-          <span class="cake-tag">Caramel</span>
-          <h3>Caramel Crunch</h3>
-          <p class="cake-desc">Salted caramel layers topped with golden praline crunch.</p>
-          <div class="card-footer">
-            <span class="cake-price">$35</span>
-            <button class="order-btn" data-name="Caramel Crunch" data-price="35">Order Now</button>
-          </div>
-        </div>
-      </div>
+body.dark .field-group input::placeholder {
+  color: #7a5535;
+}
 
-    </div>
-  </section>
+body.dark #hero {
+  background: linear-gradient(135deg, #2a1500 0%, #1a0a1a 100%);
+}
 
-  <section id="testimonials">
-    <div class="section-header">
-      <h2>What Our Customers Say</h2>
-      <p>Real people, real celebrations, real smiles</p>
-    </div>
-    <div class="testi-container">
+body.dark #email {
+  background: rgba(255,255,255,0.07);
+  border-color: #4a2e10;
+  color: var(--text);
+}
 
-      <div class="testi-card">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"The Chocolate Dream was absolutely incredible. My daughter's birthday was made so special — everyone kept asking where we got it!"</p>
-        <div class="testi-author">
-          <div class="avatar" style="background:#d2691e;">BA</div>
-          <div>
-            <p class="testi-name">Brighton Asumani</p>
-            <p class="testi-role">Birthday order · Nairobi</p>
-          </div>
-        </div>
-      </div>
+body.dark .cake-tag {
+  background: #3a2010;
+}
 
-      <div class="testi-card">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"Ordered the Wedding Deluxe for our big day. Perfect design, on-time delivery, and it tasted even better than it looked!"</p>
-        <div class="testi-author">
-          <div class="avatar" style="background:#a0522d;">JK</div>
-          <div>
-            <p class="testi-name">James & Kezia</p>
-            <p class="testi-role">Wedding order</p>
-          </div>
-        </div>
-      </div>
+body.dark .confirm-details {
+  border-color: #4a2e10;
+}
 
-      <div class="testi-card">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"I've ordered three times now and SweetBite never disappoints. The Strawberry Bliss is my go-to — fresh, beautiful, always on time."</p>
-        <div class="testi-author">
-          <div class="avatar" style="background:#ff7f50;">KO</div>
-          <div>
-            <p class="testi-name">Kennedy Onyango</p>
-            <p class="testi-role">Repeat customer</p>
-          </div>
-        </div>
-      </div>
+body.dark .confirm-row {
+  border-bottom-color: #3a2010;
+}
 
-    </div>
-  </section>
+body.dark .testi-author {
+  border-top-color: #3a2010;
+}
 
-  <section id="about">
-  <div class="section-header">
-    <h2>About SweetBite</h2>
-    <p>The story behind every slice</p>
-  </div>
-  <div class="about-container">
-    <div class="about-text">
-      <div class="about-block">
-        <span class="about-icon">🎂</span>
-        <div>
-          <h3>Our Story</h3>
-          <p>SweetBite was born in a small Nairobi kitchen in 2019, driven by one simple belief — that every celebration deserves a cake as special as the moment itself. What started as weekend baking for family and friends quickly grew into Nairobi's most-loved custom cake shop.</p>
-        </div>
-      </div>
-      <div class="about-block">
-        <span class="about-icon">💛</span>
-        <div>
-          <h3>Our Mission</h3>
-          <p>To create beautiful, delicious cakes that make your special moments even sweeter — crafted with premium ingredients, artistic designs, and a whole lot of love baked in.</p>
-        </div>
-      </div>
-      <div class="about-block">
-        <span class="about-icon">🌟</span>
-        <div>
-          <h3>Our Vision</h3>
-          <p>To be East Africa's most trusted cake brand — where every order feels personal, every design is unique, and every bite leaves a lasting memory.</p>
-        </div>
-      </div>
-    </div>
-    <div class="about-stats">
-      <div class="stat-card">
-        <span class="stat-num">5K+</span>
-        <span class="stat-label">Happy Customers</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num">6+</span>
-        <span class="stat-label">Years Baking</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num">50+</span>
-        <span class="stat-label">Cake Designs</span>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num">4.9★</span>
-        <span class="stat-label">Average Rating</span>
-      </div>
-    </div>
-  </div>
-</section>
+body.dark footer {
+  background: #0f0804;
+}
 
-<footer>
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <img src="https://cdn-icons-png.flaticon.com/512/2909/2909764.png" alt="SweetBite logo" width="36"/>
-      <span>SweetBite Cakes</span>
-    </div>
-    <p class="footer-tagline">Made with ❤️ and butter in Nairobi.</p>
+body.dark #delivery-banner {
+  background: #0f0804;
+}
 
-    <div class="footer-socials">
-      <!-- WhatsApp -->
-      <a href="https://wa.me/254114593974" target="_blank" rel="noopener" aria-label="WhatsApp" class="social-icon si-wa">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-      </a>
-      <!-- Instagram -->
-      <a href="https://instagram.com/sweetbites_official254" target="_blank" rel="noopener" aria-label="Instagram" class="social-icon si-ig">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-      </a>
-      <!-- Twitter / X -->
-      <a href="https://twitter.com/sweetbitecakes" target="_blank" rel="noopener" aria-label="Twitter / X" class="social-icon si-tw">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.261 5.631 5.903-5.631zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-      </a>
-      <!-- TikTok -->
-      <a href="https://tiktok.com/@sweetbitecakes" target="_blank" rel="noopener" aria-label="TikTok" class="social-icon si-tk">
-        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.75a8.27 8.27 0 004.84 1.55V6.85a4.85 4.85 0 01-1.07-.16z"/></svg>
-      </a>
-    </div>
+/* THEME TOGGLE BUTTON */
+#theme-toggle {
+  background: none;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+#theme-toggle:hover {
+  background: var(--primary);
+  color: #fff;
+}
+#theme-toggle:hover svg {
+  stroke: #fff;
+}
 
-    <p class="footer-copy">© 2025 SweetBite Cakes. All rights reserved.</p>
-  </div>
-</footer>
+/* HAMBURGER */
+#hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+#hamburger span {
+  display: block;
+  width: 24px;
+  height: 2.5px;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: var(--transition);
+}
+#hamburger.open span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+#hamburger.open span:nth-child(2) { opacity: 0; }
+#hamburger.open span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
-<a id="whatsapp-btn" href="#" aria-label="Order via WhatsApp">
-  <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28" aria-hidden="true">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-  </svg>
-  <span id="wa-badge"></span>
-</a>
+/* ABOUT SECTION */
+#about {
+  background: var(--bg-alt);
+}
 
-<div id="modal-overlay">
-  <div id="order-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <button id="modal-close" aria-label="Close">&times;</button>
+.about-container {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+}
 
-    <!-- STEP 1: Form -->
-    <div id="modal-step-1">
-      <div class="modal-header">
-        <div class="modal-cake-badge" id="modal-badge">🎂</div>
-        <div>
-          <p class="modal-eyebrow">You're ordering</p>
-          <h2 id="modal-title" class="modal-cake-name">Chocolate Dream</h2>
-          <p class="modal-cake-price" id="modal-price">$100</p>
-        </div>
-      </div>
+.about-text {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
 
-      <div class="modal-body">
-        <div class="field-group">
-          <label for="order-name">Full name</label>
-          <input type="text" id="order-name" placeholder="e.g. Amara Osei" autocomplete="name" />
-          <span class="field-error" id="err-name"></span>
-        </div>
-        <div class="field-group">
-          <label for="order-phone">Phone number</label>
-          <input type="tel" id="order-phone" placeholder="e.g. 0712 345 678" autocomplete="tel" />
-          <span class="field-error" id="err-phone"></span>
-        </div>
-        <div class="field-group">
-          <label for="order-address">Delivery address</label>
-          <input type="text" id="order-address" placeholder="e.g. Westlands, Nairobi" autocomplete="street-address" />
-          <span class="field-error" id="err-address"></span>
-        </div>
-        <div class="field-group">
-          <label for="order-date">Delivery date</label>
-          <input type="date" id="order-date" />
-          <span class="field-error" id="err-date"></span>
-        </div>
-        <div class="field-group">
-          <label for="order-notes">Special instructions <span class="optional">(optional)</span></label>
-          <input type="text" id="order-notes" placeholder="e.g. Write Happy Birthday on top" />
-        </div>
-      </div>
+.about-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.about-block:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hov);
+}
 
-      <div class="modal-footer">
-        <button id="modal-submit" class="btn-primary">Confirm Order 🎉</button>
-      </div>
-    </div>
+.about-icon {
+  font-size: 1.8rem;
+  width: 52px;
+  height: 52px;
+  background: var(--bg-alt);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-    <!-- STEP 2: Confirmation -->
-    <div id="modal-step-2" class="hidden">
-      <div class="confirm-icon">✅</div>
-      <h2 class="confirm-title">Order placed!</h2>
-      <p class="confirm-sub">Here's your order summary</p>
+.about-block h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
 
-      <div class="confirm-details" id="confirm-details"></div>
+.about-block p {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
 
-      <div class="modal-footer">
-        <button id="modal-done" class="btn-primary">Done</button>
-      </div>
-    </div>
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
 
-  </div>
-</div>
+.stat-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hov);
+}
 
-<button id="back-to-top" aria-label="Back to top">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-       stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-    <polyline points="18 15 12 9 6 15"/>
-  </svg>
-</button>
+.stat-num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* FOOTER SOCIALS */
+.footer-socials {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 4px 0;
+}
+
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
+  transition: transform var(--transition), opacity var(--transition);
+  opacity: 0.9;
+}
+.social-icon:hover {
+  transform: translateY(-3px) scale(1.12);
+  opacity: 1;
+}
+
+.si-wa { background: #25d366; }
+.si-ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+.si-tw { background: #000; }
+.si-tk { background: #010101; }
+
+
+/* HERO */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 140px 20px 80px;
+  background: linear-gradient(135deg, #ffe8cc 0%, #ffd6e0 100%);
+  color: var(--secondary);
+}
+
+.hero-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.7);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 30px;
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+
+.hero-content h1 {
+  font-size: 3.4rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 18px;
+}
+
+.hero-content p {
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.85;
+}
+
+#form {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+#email {
+  padding: 14px 18px;
+  width: 300px;
+  border-radius: 30px;
+  border: 1.5px solid #ddd;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: rgba(255,255,255,0.9);
+  transition: var(--transition);
+}
+#email:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(210,105,30,0.15);
+}
+
+#submit {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+#submit:hover {
+  background: var(--primary-dk);
+  transform: scale(1.04);
+}
+
+.hero-note {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+/* BACK TO TOP */
+#back-to-top {
+  position: fixed;
+  bottom: 96px;              
+  right: 28px;
+  width: 44px;
+  height: 44px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1050;
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+#back-to-top:hover {
+  background: var(--primary-dk);
+  transform: translateY(0) scale(1.1);
+}
+#back-to-top.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+/* WHATSAPP BUTTON */
+#whatsapp-btn {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  width: 56px;
+  height: 56px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  z-index: 1100;
+  transition: transform 0.2s, background 0.2s;
+}
+#whatsapp-btn:hover {
+  background: #1ebe5d;
+  transform: scale(1.1);
+}
+#whatsapp-btn.has-items {
+  animation: wa-pulse 2s infinite;
+}
+#wa-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: none;
+}
+#whatsapp-btn.has-items #wa-badge {
+  display: block;
+}
+@keyframes wa-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.08); }
+}
+/*SHARED SECTION STYLES */
+section {
+  padding: 90px 24px;
+}
+
+#features        { background: var(--bg); }
+#pricing         { background: var(--bg-alt); }
+#testimonials    { background: var(--bg); }
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+.section-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin-bottom: 8px;
+}
+.section-header p {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+/* FEATURES */
+.feature-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.feature {
+  background: var(--card-bg);
+  width: 210px;
+  padding: 28px 22px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: transform var(--transition), box-shadow var(--transition);
+  opacity: 0;
+  transform: translateY(28px);
+}
+.feature.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.feature:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hov);
+}
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+.feature h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.feature p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/*  CAKE COLLECTION / PRICING */
+
+   .pricing-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  max-width: 1020px;
+  margin: 0 auto;
+}
+
+.price-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition), box-shadow var(--transition);
+  opacity: 0;
+  transform: translateY(28px);
+}
+.price-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.price-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-hov);
+}
+
+.card-img-wrap {
+  position: relative;
+  overflow: hidden;
+  height: 170px;
+}
+.card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.price-card:hover .card-img-wrap img {
+  transform: scale(1.06);
+}
+
+.badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  z-index: 1;
+}
+.badge.popular  { background: var(--primary); }
+.badge.new-badge { background: var(--accent); }
+
+.card-body {
+  padding: 16px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.cake-tag {
+  display: inline-block;
+  background: #fff0e5;
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  width: fit-content;
+}
+
+.card-body h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.cake-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.cake-price {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--secondary);
+}
+
+.order-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.order-btn:hover {
+  background: var(--primary-dk);
+  transform: scale(1.05);
+}
+
+/* MODAL OVERLAY */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* MODAL CARD */
+#order-modal {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.25s ease;
+}
+#modal-overlay.open #order-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* CLOSE BUTTON */
+#modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  z-index: 1;
+  transition: color var(--transition);
+}
+#modal-close:hover { color: var(--primary); }
+
+/* MODAL HEADER */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 24px 24px 0;
+}
+.modal-cake-badge {
+  font-size: 2.2rem;
+  width: 56px;
+  height: 56px;
+  background: var(--bg-alt);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.modal-eyebrow {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+.modal-cake-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 0 0 2px;
+}
+.modal-cake-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0;
+}
+
+/* FORM */
+.modal-body {
+  padding: 20px 24px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.field-group label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+.optional {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.field-group input {
+  padding: 11px 14px;
+  border: 1.5px solid #e0d0c4;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--bg);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.field-group input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(210,105,30,0.12);
+}
+.field-group input.invalid {
+  border-color: #e74c3c;
+}
+.field-error {
+  font-size: 0.75rem;
+  color: #e74c3c;
+  min-height: 16px;
+  display: block;
+}
+
+/* FOOTER */
+.modal-footer {
+  padding: 20px 24px 24px;
+}
+.btn-primary {
+  width: 100%;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 13px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-primary:hover {
+  background: var(--primary-dk);
+  transform: scale(1.02);
+}
+
+/* CONFIRMATION */
+.confirm-icon {
+  text-align: center;
+  font-size: 2.8rem;
+  padding: 28px 0 8px;
+}
+.confirm-title {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 0 0 4px;
+}
+.confirm-sub {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 20px;
+}
+.confirm-details {
+  margin: 0 24px;
+  border: 1.5px solid #e0d0c4;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.confirm-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f0e0d0;
+}
+.confirm-row:last-child { border-bottom: none; }
+.confirm-row span:first-child {
+  color: var(--text-muted);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.confirm-row span:last-child {
+  color: var(--secondary);
+  font-weight: 600;
+  text-align: right;
+}
+
+.hidden { display: none !important; }
+
+/* TESTIMONIALS */
+.testi-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.testi-card {
+  background: var(--card-bg);
+  width: 290px;
+  padding: 26px 24px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: transform var(--transition), box-shadow var(--transition);
+  opacity: 0;
+  transform: translateY(28px);
+}
+
+.testi-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.testi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-hov);
+}
+
+.stars {
+  color: #f5a623;
+  font-size: 1rem;
+  letter-spacing: 2px;
+}
+
+.testi-text {
+  font-size: 0.88rem;
+  color: #555;
+  line-height: 1.65;
+  font-style: italic;
+  flex: 1;
+}
+
+.testi-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #f0e0d0;
+  padding-top: 14px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.testi-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--secondary);
+  margin: 0;
+}
+.testi-role {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* FOOTER */
+footer {
+  background: var(--primary);
+  padding: 36px 24px;
+  border-top-left-radius: var(--radius);
+  border-top-right-radius: var(--radius);
+}
+
+.footer-inner {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.footer-tagline {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.footer-copy {
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  #header {
+    padding: 14px 20px;
+  }
+
+  #hamburger {
+    display: flex;
+  }
+
+  #nav-bar {
+    display: none;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 248, 244, 0.98);
+    padding: 16px 20px 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+  }
+
+  #nav-bar.open {
+    display: block;
+  }
+
+  #nav-bar ul {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 10px 14px;
+  }
+
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  #email {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .pricing-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .testi-card {
+    width: 100%;
+    max-width: 340px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 { font-size: 1.9rem; }
+  .section-header h2 { font-size: 1.6rem; }
+  .feature-container { flex-direction: column; align-items: center; }
+  .feature { width: 100%; max-width: 320px; }
+}
