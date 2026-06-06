@@ -48,6 +48,27 @@ backToTop.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
+// DARK MODE TOGGLE
+const themeToggle = document.getElementById('theme-toggle');
+const iconMoon    = document.getElementById('icon-moon');
+const iconSun     = document.getElementById('icon-sun');
+
+// Restore saved preference
+if (localStorage.getItem('theme') === 'dark') {
+  document.body.classList.add('dark');
+  iconMoon.style.display = 'none';
+  iconSun.style.display  = 'block';
+}
+
+themeToggle.addEventListener('click', () => {
+  const isDark = document.body.classList.toggle('dark');
+
+  iconMoon.style.display = isDark ? 'none'  : 'block';
+  iconSun.style.display  = isDark ? 'block' : 'none';
+
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
+
 // SCROLL REVEAL 
 const revealEls = document.querySelectorAll('.feature, .price-card, .testi-card, .about-block, .stat-card');
 
