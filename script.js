@@ -1,4 +1,3 @@
-
 //  TOAST 
 const toast = document.getElementById('toast');
 let toastTimer;
@@ -32,6 +31,19 @@ form.addEventListener('submit', function (e) {
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+// PROMO BANNER
+const promoBanner = document.getElementById('promo-banner');
+const promoClose   = document.getElementById('promo-close');
+
+if (sessionStorage.getItem('promoDismissed') === '1') {
+  promoBanner.classList.add('hidden');
+}
+
+promoClose.addEventListener('click', () => {
+  promoBanner.classList.add('hidden');
+  sessionStorage.setItem('promoDismissed', '1');
+});
 
 // BACK TO TOP
 const backToTop = document.getElementById('back-to-top');
@@ -70,7 +82,7 @@ themeToggle.addEventListener('click', () => {
 });
 
 // SCROLL REVEAL 
-const revealEls = document.querySelectorAll('.feature, .price-card, .testi-card, .about-block, .stat-card');
+const revealEls = document.querySelectorAll('.feature, .price-card, .testi-card, .about-block, .stat-card, .gallery-item, .faq-item');
 
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
@@ -292,3 +304,124 @@ window.addEventListener('scroll', () => {
     header.style.boxShadow    = '0 2px 12px rgba(0,0,0,0.08)';
   }
 }, { passive: true });
+
+
+// GALLERY + LIGHTBOX
+const galleryItems  = Array.from(document.querySelectorAll('.gallery-item'));
+const lightbox      = document.getElementById('lightbox');
+const lightboxImg    = document.getElementById('lightbox-img');
+const lightboxCap    = document.getElementById('lightbox-caption');
+const lightboxClose  = document.getElementById('lightbox-close');
+const lightboxPrev   = document.getElementById('lightbox-prev');
+const lightboxNext   = document.getElementById('lightbox-next');
+
+let currentGalleryIndex = 0;
+
+function openLightbox(index) {
+  currentGalleryIndex = index;
+  renderLightbox();
+  lightbox.classList.add('open');
+}
+
+function renderLightbox() {
+  const item = galleryItems[currentGalleryIndex];
+  const img  = item.querySelector('img');
+  lightboxImg.src = img.src;
+  lightboxImg.alt = img.alt;
+  lightboxCap.textContent = item.dataset.caption || img.alt || '';
+}
+
+function closeLightbox() {
+  lightbox.classList.remove('open');
+}
+
+function showNext(delta) {
+  currentGalleryIndex = (currentGalleryIndex + delta + galleryItems.length) % galleryItems.length;
+  renderLightbox();
+}
+
+galleryItems.forEach((item, index) => {
+  item.addEventListener('click', () => openLightbox(index));
+});
+
+lightboxClose.addEventListener('click', closeLightbox);
+lightboxPrev.addEventListener('click', () => showNext(-1));
+lightboxNext.addEventListener('click', () => showNext(1));
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+document.addEventListener('keydown', e => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape')     closeLightbox();
+  if (e.key === 'ArrowLeft')  showNext(-1);
+  if (e.key === 'ArrowRight') showNext(1);
+});
+
+
+// FAQ ACCORDION
+document.querySelectorAll('.faq-item').forEach(item => {
+  const question = item.querySelector('.faq-question');
+  const wrap      = item.querySelector('.faq-answer-wrap');
+
+  question.addEventListener('click', () => {
+    const isOpen = item.classList.contains('open');
+
+    // Close any other open item
+    document.querySelectorAll('.faq-item.open').forEach(openItem => {
+      if (openItem !== item) {
+        openItem.classList.remove('open');
+        openItem.querySelector('.faq-answer-wrap').style.maxHeight = null;
+      }
+    });
+
+    if (isOpen) {
+      item.classList.remove('open');
+      wrap.style.maxHeight = null;
+    } else {
+      item.classList.add('open');
+      wrap.style.maxHeight = wrap.scrollHeight + 'px';
+    }
+  });
+});
+
+
+// CONTACT FORM
+const contactForm    = document.getElementById('contact-form');
+const contactSuccess  = document.getElementById('contact-success');
+
+function clearContactErrors() {
+  ['contact-name', 'contact-email', 'contact-message'].forEach(id => {
+    document.getElementById(`err-${id}`).textContent = '';
+    document.getElementById(id).classList.remove('invalid');
+  });
+}
+
+function setContactError(id, msg) {
+  document.getElementById(`err-${id}`).textContent = msg;
+  document.getElementById(id).classList.add('invalid');
+}
+
+contactForm.addEventListener('submit', e => {
+  e.preventDefault();
+  clearContactErrors();
+
+  const name    = document.getElementById('contact-name').value.trim();
+  const email   = document.getElementById('contact-email').value.trim();
+  const message = document.getElementById('contact-message').value.trim();
+  let valid = true;
+
+  if (!name)                     { setContactError('contact-name', 'Please enter your name.'); valid = false; }
+  if (!email)                    { setContactError('contact-email', 'Please enter your email.'); valid = false; }
+  else if (!isValidEmail(email)) { setContactError('contact-email', 'Enter a valid email address.'); valid = false; }
+  if (!message)                  { setContactError('contact-message', 'Please write a short message.'); valid = false; }
+
+  if (!valid) return;
+
+  contactForm.classList.add('hidden');
+  contactSuccess.classList.remove('hidden');
+  showToast('💌 Message sent! We\'ll be in touch soon.');
+
+  setTimeout(() => {
+    contactForm.reset();
+    contactForm.classList.remove('hidden');
+    contactSuccess.classList.add('hidden');
+  }, 4000);
+});
