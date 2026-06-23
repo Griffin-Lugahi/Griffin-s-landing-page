@@ -29,10 +29,25 @@
       </ul>
     </nav>
     <div class="header-actions">
-      <button id="cart-btn" aria-label="View cart">
-        🛒 Cart <span id="cart-count">0</span>
-      </button>
-      
+      <div class="cart-wrapper">
+        <button id="cart-btn" aria-label="View cart" aria-haspopup="true" aria-expanded="false">
+          🛒 Cart <span id="cart-count">0</span>
+        </button>
+
+        <div id="cart-dropdown" class="cart-dropdown" role="dialog" aria-label="Shopping cart">
+          <div class="cart-dropdown-header">
+            <h4>Your Cart</h4>
+            <button id="cart-dropdown-close" aria-label="Close cart">&times;</button>
+          </div>
+          <div id="cart-items-list" class="cart-items-list"></div>
+          <div class="cart-dropdown-footer">
+            <div class="cart-total-row"><span>Total</span><span id="cart-total">$0</span></div>
+            <button id="cart-checkout-btn" class="btn-primary">Order via WhatsApp</button>
+            <button id="cart-clear-btn" class="cart-clear-btn">Clear cart</button>
+          </div>
+        </div>
+      </div>
+
       <button id="theme-toggle" aria-label="Toggle dark mode">
   
         <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
