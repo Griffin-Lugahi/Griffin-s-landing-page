@@ -136,7 +136,16 @@ navLinks.forEach(link => {
 
 
 // CART + ORDER MODAL
-const cartCount   = document.getElementById('cart-count');
+const cartCount     = document.getElementById('cart-count');
+const cartBtn        = document.getElementById('cart-btn');
+const cartDropdown   = document.getElementById('cart-dropdown');
+const cartDropdownClose = document.getElementById('cart-dropdown-close');
+const cartItemsList  = document.getElementById('cart-items-list');
+const cartTotalEl    = document.getElementById('cart-total');
+const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
+const cartClearBtn   = document.getElementById('cart-clear-btn');
+const whatsappBtn    = document.getElementById('whatsapp-btn');
+
 const overlay     = document.getElementById('modal-overlay');
 const step1       = document.getElementById('modal-step-1');
 const step2       = document.getElementById('modal-step-2');
@@ -211,7 +220,145 @@ document.querySelectorAll('.order-btn').forEach(btn => {
   });
 });
 
-// Submit form
+// --- Cart dropdown rendering & cart state helpers ---
+
+function cartItemCount() {
+  return Object.values(cart).reduce((s, i) => s + i.qty, 0);
+}
+
+function updateCartCount() {
+  cartCount.textContent = cartItemCount();
+}
+
+function bumpCartCount() {
+  cartCount.classList.remove('bump');
+  void cartCount.offsetWidth;
+  cartCount.classList.add('bump');
+  setTimeout(() => cartCount.classList.remove('bump'), 300);
+}
+
+function syncWhatsAppBadge() {
+  whatsappBtn.classList.toggle('has-items', cartItemCount() > 0);
+}
+
+function renderCart() {
+  const entries = Object.entries(cart);
+
+  if (entries.length === 0) {
+    cartItemsList.innerHTML = `
+      <div class="cart-empty">
+        <p>🛒</p>
+        <p>Your cart is empty</p>
+        <p class="cart-empty-sub">Add a cake to get started!</p>
+      </div>`;
+    cartTotalEl.textContent = '$0';
+    cartCheckoutBtn.disabled = true;
+    return;
+  }
+
+  cartCheckoutBtn.disabled = false;
+  let total = 0;
+
+  cartItemsList.innerHTML = entries.map(([name, { price, qty }]) => {
+    total += price * qty;
+    return `
+      <div class="cart-item" data-name="${name}">
+        <div class="cart-item-info">
+          <p class="cart-item-name">${name}</p>
+          <p class="cart-item-price">$${price} each</p>
+        </div>
+        <div class="cart-item-qty">
+          <button class="qty-btn qty-dec" aria-label="Decrease quantity of ${name}">−</button>
+          <span class="qty-num">${qty}</span>
+          <button class="qty-btn qty-inc" aria-label="Increase quantity of ${name}">+</button>
+        </div>
+        <span class="cart-item-subtotal">$${price * qty}</span>
+        <button class="cart-item-remove" aria-label="Remove ${name} from cart">&times;</button>
+      </div>`;
+  }).join('');
+
+  cartTotalEl.textContent = `$${total}`;
+}
+
+function addToCart(name, price, qty = 1) {
+  if (cart[name]) cart[name].qty += qty;
+  else cart[name] = { price, qty };
+
+  updateCartCount();
+  bumpCartCount();
+  renderCart();
+  syncWhatsAppBadge();
+}
+
+// Open / close the dropdown
+function openCartDropdown() {
+  cartDropdown.classList.add('open');
+  cartBtn.setAttribute('aria-expanded', 'true');
+}
+
+function closeCartDropdown() {
+  cartDropdown.classList.remove('open');
+  cartBtn.setAttribute('aria-expanded', 'false');
+}
+
+cartBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (cartDropdown.classList.contains('open')) closeCartDropdown();
+  else openCartDropdown();
+});
+
+cartDropdownClose.addEventListener('click', closeCartDropdown);
+
+document.addEventListener('click', (e) => {
+  if (!cartDropdown.classList.contains('open')) return;
+  if (cartDropdown.contains(e.target) || cartBtn.contains(e.target)) return;
+  closeCartDropdown();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeCartDropdown();
+});
+
+// Quantity +/- and remove, via delegation
+cartItemsList.addEventListener('click', (e) => {
+  const itemEl = e.target.closest('.cart-item');
+  if (!itemEl) return;
+  const name = itemEl.dataset.name;
+  if (!cart[name]) return;
+
+  if (e.target.classList.contains('qty-inc')) {
+    cart[name].qty++;
+  } else if (e.target.classList.contains('qty-dec')) {
+    cart[name].qty--;
+    if (cart[name].qty <= 0) delete cart[name];
+  } else if (e.target.classList.contains('cart-item-remove')) {
+    delete cart[name];
+  } else {
+    return;
+  }
+
+  renderCart();
+  updateCartCount();
+  syncWhatsAppBadge();
+});
+
+cartClearBtn.addEventListener('click', () => {
+  if (Object.keys(cart).length === 0) return;
+  Object.keys(cart).forEach(k => delete cart[k]);
+  renderCart();
+  updateCartCount();
+  syncWhatsAppBadge();
+  showToast('🗑️ Cart cleared');
+});
+
+cartCheckoutBtn.addEventListener('click', () => {
+  if (Object.keys(cart).length === 0) return;
+  const msg = buildWhatsAppMessage();
+  const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+});
+
+// Submit order form
 document.getElementById('modal-submit').addEventListener('click', () => {
   if (!validateForm()) return;
 
@@ -222,17 +369,9 @@ document.getElementById('modal-submit').addEventListener('click', () => {
   const notes   = document.getElementById('order-notes').value.trim();
   const dateStr = date.toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  // Add to cart tracking
+  // Add to cart
   const { name: itemName, price } = pendingItem;
-  if (cart[itemName]) cart[itemName].qty++;
-  else cart[itemName] = { price, qty: 1 };
-
-  const total = Object.values(cart).reduce((s, i) => s + i.qty, 0);
-  cartCount.textContent = total;
-  cartCount.classList.remove('bump');
-  void cartCount.offsetWidth;
-  cartCount.classList.add('bump');
-  setTimeout(() => cartCount.classList.remove('bump'), 300);
+  addToCart(itemName, price);
 
   // Build confirmation
   const rows = [
@@ -261,6 +400,10 @@ document.getElementById('modal-done').addEventListener('click', () => {
 });
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Initial render (empty cart state)
+renderCart();
+syncWhatsAppBadge();
 
 
 // WHATSAPP BUTTON
@@ -422,6 +565,6 @@ contactForm.addEventListener('submit', e => {
   setTimeout(() => {
     contactForm.reset();
     contactForm.classList.remove('hidden');
-    contactSuccess.classList.add('hidden');
+    contactForm.classList.add('hidden');
   }, 4000);
 });
