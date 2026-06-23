@@ -41,7 +41,27 @@
           </div>
           <div id="cart-items-list" class="cart-items-list"></div>
           <div class="cart-dropdown-footer">
-            <div class="cart-total-row"><span>Total</span><span id="cart-total">$0</span></div>
+
+            <div id="coupon-form" class="coupon-row">
+              <input type="text" id="coupon-input" placeholder="Coupon code" autocomplete="off" />
+              <button id="coupon-apply-btn" type="button">Apply</button>
+            </div>
+            <div id="coupon-applied" class="coupon-applied hidden">
+              <span id="coupon-applied-text">✅ SWEET15 applied</span>
+              <button id="coupon-remove-btn" type="button" aria-label="Remove coupon">&times;</button>
+            </div>
+            <span class="field-error" id="err-coupon"></span>
+
+            <div class="cart-totals">
+              <div class="cart-subtotal-row">
+                <span>Subtotal</span><span id="cart-subtotal">$0</span>
+              </div>
+              <div class="cart-discount-row hidden" id="cart-discount-row">
+                <span id="cart-discount-label">Discount</span><span id="cart-discount">-$0</span>
+              </div>
+              <div class="cart-total-row"><span>Total</span><span id="cart-total">$0</span></div>
+            </div>
+
             <button id="cart-checkout-btn" class="btn-primary">Order via WhatsApp</button>
             <button id="cart-clear-btn" class="cart-clear-btn">Clear cart</button>
           </div>
