@@ -146,6 +146,18 @@ const cartCheckoutBtn = document.getElementById('cart-checkout-btn');
 const cartClearBtn   = document.getElementById('cart-clear-btn');
 const whatsappBtn    = document.getElementById('whatsapp-btn');
 
+const couponInput      = document.getElementById('coupon-input');
+const couponApplyBtn   = document.getElementById('coupon-apply-btn');
+const couponForm       = document.getElementById('coupon-form');
+const couponApplied    = document.getElementById('coupon-applied');
+const couponAppliedText = document.getElementById('coupon-applied-text');
+const couponRemoveBtn  = document.getElementById('coupon-remove-btn');
+const couponErrorEl    = document.getElementById('err-coupon');
+const cartSubtotalEl   = document.getElementById('cart-subtotal');
+const cartDiscountRow  = document.getElementById('cart-discount-row');
+const cartDiscountLabel = document.getElementById('cart-discount-label');
+const cartDiscountEl   = document.getElementById('cart-discount');
+
 const overlay     = document.getElementById('modal-overlay');
 const step1       = document.getElementById('modal-step-1');
 const step2       = document.getElementById('modal-step-2');
@@ -155,6 +167,14 @@ const modalBadge  = document.getElementById('modal-badge');
 
 const cart = {};
 let pendingItem = null;
+let appliedCoupon = null; // { code, type: 'percent'|'flat', value, label }
+
+// Available coupon codes
+const COUPONS = {
+  SWEET15: { type: 'percent', value: 15, label: '15% off' },
+  WELCOME10: { type: 'percent', value: 10, label: '10% off' },
+  SAVE5: { type: 'flat', value: 5, label: '$5 off' },
+};
 
 // Minimum delivery date = tomorrow
 function setMinDate() {
@@ -241,6 +261,18 @@ function syncWhatsAppBadge() {
   whatsappBtn.classList.toggle('has-items', cartItemCount() > 0);
 }
 
+function calcSubtotal() {
+  return Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
+}
+
+function calcDiscount(subtotal) {
+  if (!appliedCoupon || subtotal <= 0) return 0;
+  if (appliedCoupon.type === 'percent') {
+    return Math.round(subtotal * (appliedCoupon.value / 100) * 100) / 100;
+  }
+  return Math.min(appliedCoupon.value, subtotal);
+}
+
 function renderCart() {
   const entries = Object.entries(cart);
 
@@ -251,17 +283,10 @@ function renderCart() {
         <p>Your cart is empty</p>
         <p class="cart-empty-sub">Add a cake to get started!</p>
       </div>`;
-    cartTotalEl.textContent = '$0';
     cartCheckoutBtn.disabled = true;
-    return;
-  }
-
-  cartCheckoutBtn.disabled = false;
-  let total = 0;
-
-  cartItemsList.innerHTML = entries.map(([name, { price, qty }]) => {
-    total += price * qty;
-    return `
+  } else {
+    cartCheckoutBtn.disabled = false;
+    cartItemsList.innerHTML = entries.map(([name, { price, qty }]) => `
       <div class="cart-item" data-name="${name}">
         <div class="cart-item-info">
           <p class="cart-item-name">${name}</p>
@@ -274,10 +299,23 @@ function renderCart() {
         </div>
         <span class="cart-item-subtotal">$${price * qty}</span>
         <button class="cart-item-remove" aria-label="Remove ${name} from cart">&times;</button>
-      </div>`;
-  }).join('');
+      </div>`).join('');
+  }
 
-  cartTotalEl.textContent = `$${total}`;
+  const subtotal = calcSubtotal();
+  const discount  = calcDiscount(subtotal);
+  const total     = Math.max(0, subtotal - discount);
+
+  cartSubtotalEl.textContent = `$${subtotal}`;
+  cartTotalEl.textContent    = `$${total}`;
+
+  if (appliedCoupon && discount > 0) {
+    cartDiscountRow.classList.remove('hidden');
+    cartDiscountLabel.textContent = `Discount (${appliedCoupon.code})`;
+    cartDiscountEl.textContent = `-$${discount}`;
+  } else {
+    cartDiscountRow.classList.add('hidden');
+  }
 }
 
 function addToCart(name, price, qty = 1) {
@@ -343,13 +381,65 @@ cartItemsList.addEventListener('click', (e) => {
 });
 
 cartClearBtn.addEventListener('click', () => {
-  if (Object.keys(cart).length === 0) return;
+  if (Object.keys(cart).length === 0 && !appliedCoupon) return;
   Object.keys(cart).forEach(k => delete cart[k]);
+  removeCoupon(false);
   renderCart();
   updateCartCount();
   syncWhatsAppBadge();
   showToast('🗑️ Cart cleared');
 });
+
+function applyCoupon() {
+  const code = couponInput.value.trim().toUpperCase();
+  couponErrorEl.textContent = '';
+  couponInput.classList.remove('invalid');
+
+  if (!code) {
+    couponErrorEl.textContent = 'Enter a coupon code.';
+    couponInput.classList.add('invalid');
+    return;
+  }
+  if (Object.keys(cart).length === 0) {
+    couponErrorEl.textContent = 'Add a cake to your cart first.';
+    return;
+  }
+
+  const coupon = COUPONS[code];
+  if (!coupon) {
+    couponErrorEl.textContent = 'Invalid or expired coupon code.';
+    couponInput.classList.add('invalid');
+    showToast('⚠️ That coupon code isn\'t valid.', 'error');
+    return;
+  }
+
+  appliedCoupon = { code, ...coupon };
+  couponInput.value = '';
+  couponForm.classList.add('hidden');
+  couponApplied.classList.remove('hidden');
+  couponAppliedText.textContent = `✅ ${code} applied — ${coupon.label}`;
+  renderCart();
+  showToast(`🎉 Coupon ${code} applied!`);
+}
+
+function removeCoupon(notify = true) {
+  appliedCoupon = null;
+  couponApplied.classList.add('hidden');
+  couponForm.classList.remove('hidden');
+  couponErrorEl.textContent = '';
+  couponInput.classList.remove('invalid');
+  renderCart();
+  if (notify) showToast('Coupon removed');
+}
+
+couponApplyBtn.addEventListener('click', applyCoupon);
+couponInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    applyCoupon();
+  }
+});
+couponRemoveBtn.addEventListener('click', () => removeCoupon(true));
 
 cartCheckoutBtn.addEventListener('click', () => {
   if (Object.keys(cart).length === 0) return;
@@ -416,14 +506,21 @@ function buildWhatsAppMessage() {
   }
 
   let msg = "Hi SweetBite! I'd like to place an order:\n\n";
-  let total = 0;
+  let subtotal = 0;
 
   items.forEach(([name, { price, qty }]) => {
-    const subtotal = price * qty;
-    total += subtotal;
-    msg += `• ${name} x${qty} — $${subtotal}\n`;
+    const lineTotal = price * qty;
+    subtotal += lineTotal;
+    msg += `• ${name} x${qty} — $${lineTotal}\n`;
   });
 
+  const discount = calcDiscount(subtotal);
+  const total = Math.max(0, subtotal - discount);
+
+  msg += `\nSubtotal: $${subtotal}`;
+  if (appliedCoupon && discount > 0) {
+    msg += `\nCoupon (${appliedCoupon.code}): -$${discount}`;
+  }
   msg += `\n*Total: $${total}*`;
   msg += "\n\nPlease confirm availability and delivery details. Thank you!";
   return msg;
