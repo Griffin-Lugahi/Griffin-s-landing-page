@@ -24,8 +24,10 @@
         <li><a class="nav-link" href="#gallery">Gallery</a></li>
         <li><a class="nav-link" href="#testimonials">Reviews</a></li>
         <li><a class="nav-link" href="#faq">FAQ</a></li>
+        <li><a class="nav-link" id="nav-track-link" href="#">Track Order</a></li>
         <li><a class="nav-link" href="#contact">Contact</a></li>
         <li><a class="nav-link" href="#about">About Us</a></li>
+        <li><a class="nav-link" id="nav-track-order" href="#">Track Order</a></li>
       </ul>
     </nav>
     <div class="header-actions">
@@ -616,10 +618,82 @@ alt="Chocolate Dream cake">
       <h2 class="confirm-title">Order placed!</h2>
       <p class="confirm-sub">Here's your order summary</p>
 
+      <p class="confirm-order-id">Order ID: <strong id="confirm-order-id">—</strong></p>
       <div class="confirm-details" id="confirm-details"></div>
 
-      <div class="modal-footer">
+      <div class="modal-footer confirm-footer-actions">
+        <button id="modal-track-btn" class="btn-secondary">Track This Order</button>
         <button id="modal-done" class="btn-primary">Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ORDER TRACKING MODAL -->
+<div id="track-overlay">
+  <div id="track-modal" role="dialog" aria-modal="true" aria-labelledby="track-title">
+    <button id="track-close" aria-label="Close">&times;</button>
+
+    <!-- Lookup form -->
+    <div id="track-step-lookup">
+      <div class="modal-header">
+        <div class="modal-cake-badge">📦</div>
+        <div>
+          <p class="modal-eyebrow">Order status</p>
+          <h2 id="track-title" class="modal-cake-name">Track Your Order</h2>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="field-group">
+          <label for="track-order-id">Order ID</label>
+          <input type="text" id="track-order-id" placeholder="e.g. SB-1001" autocomplete="off" />
+          <span class="field-error" id="err-track-order-id"></span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="track-lookup-btn" class="btn-primary">Track Order</button>
+      </div>
+    </div>
+
+    <!-- Tracking result -->
+    <div id="track-step-result" class="hidden">
+      <div class="modal-header">
+        <div class="modal-cake-badge" id="track-result-badge">🎂</div>
+        <div>
+          <p class="modal-eyebrow">Order <span id="track-result-id"></span></p>
+          <h2 class="modal-cake-name" id="track-result-cake">—</h2>
+          <p class="modal-cake-price" id="track-result-eta">—</p>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="tracker">
+          <div class="tracker-step" data-stage="confirmed">
+            <div class="tracker-dot">📝</div>
+            <p class="tracker-label">Confirmed</p>
+          </div>
+          <div class="tracker-line" data-line="1"></div>
+          <div class="tracker-step" data-stage="baking">
+            <div class="tracker-dot">🧁</div>
+            <p class="tracker-label">Baking</p>
+          </div>
+          <div class="tracker-line" data-line="2"></div>
+          <div class="tracker-step" data-stage="delivery">
+            <div class="tracker-dot">🚚</div>
+            <p class="tracker-label">Out for delivery</p>
+          </div>
+          <div class="tracker-line" data-line="3"></div>
+          <div class="tracker-step" data-stage="delivered">
+            <div class="tracker-dot">🎉</div>
+            <p class="tracker-label">Delivered</p>
+          </div>
+        </div>
+        <p class="tracker-message" id="tracker-message"></p>
+      </div>
+
+      <div class="modal-footer">
+        <button id="track-another-btn" class="cart-clear-btn">Track a different order</button>
       </div>
     </div>
 
