@@ -167,6 +167,7 @@ const modalBadge  = document.getElementById('modal-badge');
 
 const cart = {};
 let pendingItem = null;
+let lastOrder = null; // most recently placed order, for the "Track This Order" shortcut
 let appliedCoupon = null; // { code, type: 'percent'|'flat', value, label }
 
 // Available coupon codes
@@ -452,18 +453,36 @@ cartCheckoutBtn.addEventListener('click', () => {
 document.getElementById('modal-submit').addEventListener('click', () => {
   if (!validateForm()) return;
 
-  const name    = document.getElementById('order-name').value.trim();
-  const phone   = document.getElementById('order-phone').value.trim();
-  const address = document.getElementById('order-address').value.trim();
-  const date    = new Date(document.getElementById('order-date').value + 'T00:00:00');
-  const notes   = document.getElementById('order-notes').value.trim();
-  const dateStr = date.toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const name      = document.getElementById('order-name').value.trim();
+  const phone     = document.getElementById('order-phone').value.trim();
+  const address   = document.getElementById('order-address').value.trim();
+  const dateInput = document.getElementById('order-date').value;
+  const date      = new Date(dateInput + 'T00:00:00');
+  const notes     = document.getElementById('order-notes').value.trim();
+  const dateStr   = date.toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
   // Add to cart
   const { name: itemName, price } = pendingItem;
   addToCart(itemName, price);
 
+  // Create a trackable order record
+  const orderId = generateOrderId();
+  lastOrder = {
+    id: orderId,
+    cake: itemName,
+    price,
+    name,
+    phone,
+    address,
+    notes,
+    date: dateInput,
+    placedAt: Date.now(),
+  };
+  addOrderRecord(lastOrder);
+
   // Build confirmation
+  document.getElementById('confirm-order-id').textContent = orderId;
+
   const rows = [
     ['Cake',     itemName],
     ['Price',    `$${price}`],
@@ -487,6 +506,14 @@ document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-done').addEventListener('click', () => {
   closeModal();
   showToast(`🎉 Order for "${pendingItem?.name ?? 'your cake'}" confirmed!`);
+});
+document.getElementById('modal-track-btn').addEventListener('click', () => {
+  closeModal();
+  if (lastOrder) {
+    openTrackModal();
+    document.getElementById('track-order-id').value = lastOrder.id;
+    lookupOrder(lastOrder.id);
+  }
 });
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
@@ -664,4 +691,181 @@ contactForm.addEventListener('submit', e => {
     contactForm.classList.remove('hidden');
     contactForm.classList.add('hidden');
   }, 4000);
+});
+
+
+// ORDER TRACKING
+//
+// NOTE: This is a static demo site with no backend, so order status is
+// simulated client-side based on elapsed time since the order was placed
+// (using short demo timings rather than real kitchen/delivery timings).
+// Orders are persisted to localStorage so an order ID can be looked up
+// again later, including after a page refresh.
+
+const ORDERS_KEY = 'sweetbite_orders';
+
+// Simulated stage timings (ms elapsed since order placed)
+const TRACK_STAGE_KEYS = ['confirmed', 'baking', 'delivery', 'delivered'];
+const TRACK_STAGE_THRESHOLDS = [0, 30 * 1000, 90 * 1000, 180 * 1000];
+const TRACK_STAGE_MESSAGES = [
+  "Your order has been confirmed — we'll start baking soon! 📝",
+  "Good news — your cake is in the oven right now! 🧁",
+  "Your cake is out for delivery and on its way! 🚚",
+  "Delivered! We hope you enjoy every bite. 🎉",
+];
+
+function getOrders() {
+  try {
+    return JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function saveOrders(orders) {
+  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders.slice(0, 20)));
+}
+
+function generateOrderId() {
+  const existing = new Set(getOrders().map(o => o.id));
+  let id;
+  do {
+    id = 'SB-' + (1000 + Math.floor(Math.random() * 9000));
+  } while (existing.has(id));
+  return id;
+}
+
+function addOrderRecord(order) {
+  const orders = getOrders();
+  orders.unshift(order);
+  saveOrders(orders);
+}
+
+function findOrder(idStr) {
+  const id = idStr.trim().toUpperCase();
+  if (!id) return null;
+  return getOrders().find(o => o.id.toUpperCase() === id) || null;
+}
+
+function getStageIndex(order) {
+  const elapsed = Date.now() - order.placedAt;
+  let idx = 0;
+  TRACK_STAGE_THRESHOLDS.forEach((t, i) => { if (elapsed >= t) idx = i; });
+  return idx;
+}
+
+function formatOrderDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-KE', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+// --- Tracker modal elements ---
+const trackOverlay     = document.getElementById('track-overlay');
+const trackStepLookup  = document.getElementById('track-step-lookup');
+const trackStepResult  = document.getElementById('track-step-result');
+const trackInput       = document.getElementById('track-order-id');
+const trackErrorEl     = document.getElementById('err-track-order-id');
+const navTrackLink     = document.getElementById('nav-track-link');
+let trackerPollInterval = null;
+
+function openTrackModal() {
+  trackOverlay.classList.add('open');
+  trackStepLookup.classList.remove('hidden');
+  trackStepResult.classList.add('hidden');
+  trackErrorEl.textContent = '';
+  trackInput.classList.remove('invalid');
+  setTimeout(() => trackInput.focus(), 250);
+}
+
+function closeTrackModal() {
+  trackOverlay.classList.remove('open');
+  clearInterval(trackerPollInterval);
+  trackerPollInterval = null;
+}
+
+function renderTracker(order) {
+  const stageIndex = getStageIndex(order);
+
+  document.getElementById('track-result-id').textContent = order.id;
+  document.getElementById('track-result-cake').textContent = order.cake;
+  document.getElementById('track-result-eta').textContent = order.date
+    ? `Expected delivery: ${formatOrderDate(order.date)}`
+    : '';
+
+  const steps = trackStepResult.querySelectorAll('.tracker-step');
+  steps.forEach((stepEl, i) => {
+    stepEl.classList.remove('completed', 'active');
+    if (i < stageIndex) stepEl.classList.add('completed');
+    else if (i === stageIndex) stepEl.classList.add('active');
+  });
+
+  const lines = trackStepResult.querySelectorAll('.tracker-line');
+  lines.forEach((lineEl, i) => {
+    lineEl.classList.toggle('completed', i < stageIndex);
+  });
+
+  document.getElementById('tracker-message').textContent = TRACK_STAGE_MESSAGES[stageIndex];
+
+  trackStepLookup.classList.add('hidden');
+  trackStepResult.classList.remove('hidden');
+}
+
+function startTrackerPolling(order) {
+  clearInterval(trackerPollInterval);
+  trackerPollInterval = setInterval(() => renderTracker(order), 5000);
+}
+
+function lookupOrder(idStr) {
+  trackErrorEl.textContent = '';
+  trackInput.classList.remove('invalid');
+
+  const id = (idStr || '').trim();
+  if (!id) {
+    trackErrorEl.textContent = 'Please enter an order ID.';
+    trackInput.classList.add('invalid');
+    return;
+  }
+
+  const order = findOrder(id);
+  if (!order) {
+    trackErrorEl.textContent = 'No order found with that ID.';
+    trackInput.classList.add('invalid');
+    showToast('⚠️ Order not found.', 'error');
+    return;
+  }
+
+  renderTracker(order);
+  startTrackerPolling(order);
+}
+
+// --- Tracker modal events ---
+navTrackLink.addEventListener('click', (e) => {
+  e.preventDefault();
+  hamburger.classList.remove('open');
+  navBar.classList.remove('open');
+  trackInput.value = '';
+  openTrackModal();
+});
+
+document.getElementById('track-close').addEventListener('click', closeTrackModal);
+trackOverlay.addEventListener('click', e => { if (e.target === trackOverlay) closeTrackModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTrackModal(); });
+
+document.getElementById('track-lookup-btn').addEventListener('click', () => lookupOrder(trackInput.value));
+trackInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    lookupOrder(trackInput.value);
+  }
+});
+
+document.getElementById('track-another-btn').addEventListener('click', () => {
+  clearInterval(trackerPollInterval);
+  trackStepResult.classList.add('hidden');
+  trackStepLookup.classList.remove('hidden');
+  trackInput.value = '';
+  trackErrorEl.textContent = '';
+  trackInput.classList.remove('invalid');
+  setTimeout(() => trackInput.focus(), 150);
 });
