@@ -497,6 +497,9 @@ document.getElementById('modal-submit').addEventListener('click', () => {
     .map(([k, v]) => `<div class="confirm-row"><span>${k}</span><span>${v}</span></div>`)
     .join('');
 
+  // Auto-open a pre-filled WhatsApp confirmation message for this order
+  sendOrderWhatsAppConfirmation(lastOrder);
+
   step1.classList.add('hidden');
   step2.classList.remove('hidden');
 });
@@ -506,6 +509,9 @@ document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-done').addEventListener('click', () => {
   closeModal();
   showToast(`🎉 Order for "${pendingItem?.name ?? 'your cake'}" confirmed!`);
+});
+document.getElementById('resend-wa-btn').addEventListener('click', () => {
+  if (lastOrder) sendOrderWhatsAppConfirmation(lastOrder);
 });
 document.getElementById('modal-track-btn').addEventListener('click', () => {
   closeModal();
@@ -551,6 +557,36 @@ function buildWhatsAppMessage() {
   msg += `\n*Total: $${total}*`;
   msg += "\n\nPlease confirm availability and delivery details. Thank you!";
   return msg;
+}
+
+// Builds the order-confirmation WhatsApp message sent right after checkout
+// (separate from the cart checkout message above, which can bundle multiple cakes).
+function buildOrderWhatsAppMessage(order) {
+  const dateStr = order.date
+    ? new Date(order.date + 'T00:00:00').toLocaleDateString('en-KE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    : 'N/A';
+
+  let msg = "Hi SweetBite! I just placed an order — please confirm:\n\n";
+  msg += `Order ID: ${order.id}\n`;
+  msg += `Cake: ${order.cake}\n`;
+  msg += `Price: $${order.price}\n`;
+  msg += `Name: ${order.name}\n`;
+  msg += `Phone: ${order.phone}\n`;
+  msg += `Delivery: ${order.address}\n`;
+  msg += `Date: ${dateStr}\n`;
+  if (order.notes) msg += `Notes: ${order.notes}\n`;
+  msg += "\nLooking forward to your confirmation. Thank you!";
+  return msg;
+}
+
+// Opens a pre-filled WhatsApp chat with the shop so the order acts as
+// an automatic confirmation message — there's no backend here, so this
+// is the closest equivalent to an email/SMS receipt this site can send.
+function sendOrderWhatsAppConfirmation(order) {
+  if (!order) return;
+  const msg = buildOrderWhatsAppMessage(order);
+  const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
 }
 
 document.getElementById('whatsapp-btn').addEventListener('click', () => {
