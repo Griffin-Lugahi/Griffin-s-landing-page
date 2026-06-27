@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SweetBite Cakes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500..700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -27,7 +27,6 @@
         <li><a class="nav-link" id="nav-track-link" href="#">Track Order</a></li>
         <li><a class="nav-link" href="#contact">Contact</a></li>
         <li><a class="nav-link" href="#about">About Us</a></li>
-        <li><a class="nav-link" id="nav-track-order" href="#">Track Order</a></li>
       </ul>
     </nav>
     <div class="header-actions">
@@ -99,15 +98,34 @@
   </header>
 
   <section id="hero">
-    <div class="hero-content">
-      <span class="hero-badge">🏆 Nairobi's #1 Custom Cake Shop</span>
-      <h1>Delight in<br>Every Bite 🍰</h1>
-      <p>Freshly baked cakes crafted with love, premium ingredients, and delivered right to your door.</p>
-      <form id="form">
-        <input type="email" id="email" placeholder="Enter your email for sweet offers" required />
-        <button type="submit" id="submit">Get Offers</button>
-      </form>
-      <p class="hero-note">🔒 No spam, unsubscribe anytime.</p>
+    <div class="hero-grid">
+      <div class="hero-content">
+        <span class="hero-badge">🏆 Nairobi's #1 Custom Cake Shop</span>
+        <h1>Cakes worth the
+          <span class="hero-emphasis">celebration
+            <svg class="hero-squiggle" viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M2,12 C20,2 38,2 56,12 C74,22 92,22 110,12 C128,2 146,2 164,12 C176,19 184,19 198,13" />
+            </svg>
+          </span>.
+        </h1>
+        <p>Freshly baked cakes crafted with love, premium ingredients, and delivered right to your door.</p>
+        <form id="form">
+          <input type="email" id="email" placeholder="Enter your email for sweet offers" required />
+          <button type="submit" id="submit">Get Offers</button>
+        </form>
+        <p class="hero-note">🔒 No spam, unsubscribe anytime.</p>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-photo-stack">
+          <img class="hero-photo-main" src="https://images.unsplash.com/photo-1557776959-f066eb37857f?w=700&q=80" alt="A colorful celebration cake topped with fresh flowers" loading="lazy" />
+          <img class="hero-photo-accent" src="https://images.unsplash.com/photo-1519654793190-2e8a4806f1f2?w=320&q=80" alt="Close-up detail of a flower-topped cake" loading="lazy" />
+          <div class="hero-rating-chip">
+            <span class="hero-rating-stars">★★★★★</span>
+            <span class="hero-rating-text">4.9 · 5,000+ happy customers</span>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
