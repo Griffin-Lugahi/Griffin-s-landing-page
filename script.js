@@ -60,6 +60,24 @@ backToTop.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
+// CTA BAR — appears once user scrolls past the hero
+const ctaBar       = document.getElementById('cta-bar');
+const ctaWhatsapp  = document.getElementById('cta-whatsapp');
+const heroSection  = document.getElementById('hero');
+
+function updateCtaBar() {
+  const heroBtm = heroSection.getBoundingClientRect().bottom;
+  ctaBar.classList.toggle('visible', heroBtm < 0);
+}
+window.addEventListener('scroll', updateCtaBar, { passive: true });
+updateCtaBar();
+
+ctaWhatsapp.addEventListener('click', (e) => {
+  e.preventDefault();
+  const msg = buildWhatsAppMessage();
+  window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+});
+
 // DARK MODE TOGGLE
 const themeToggle = document.getElementById('theme-toggle');
 const iconMoon    = document.getElementById('icon-moon');
