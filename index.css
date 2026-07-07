@@ -742,6 +742,189 @@ body.dark .cart-total-row {
   opacity: 0.85;
 }
 
+/* HERO — script eyebrow */
+.hero-script {
+  font-family: "Caveat", cursive;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: var(--primary-dk);
+  display: inline-block;
+  margin-bottom: 8px;
+}
+.hero-script .heart { color: var(--accent); }
+
+/* HERO — CTA buttons (replaces the old single submit-only layout) */
+.hero-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 15px 30px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.hero-btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(210,105,30,0.28);
+}
+.hero-btn-primary:hover {
+  background: var(--primary-dk);
+  transform: scale(1.04);
+}
+
+.hero-btn-ghost {
+  background: none;
+  color: var(--secondary);
+  padding: 15px 12px;
+}
+.hero-btn-play {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.hero-btn-ghost:hover .hero-btn-play {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* HERO — icon feature row (under the CTAs) */
+.hero-icon-row {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 26px;
+  flex-wrap: wrap;
+}
+.hero-icon-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--secondary);
+  line-height: 1.3;
+}
+.hero-icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(92,42,0,0.08);
+}
+
+/* HERO — compact newsletter (secondary, below the icon row now) */
+.hero-newsletter {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  max-width: 460px;
+}
+.hero-newsletter #email {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 16px;
+  border-radius: 30px;
+  border: 1.5px solid #ddd;
+  font-family: inherit;
+  font-size: 0.88rem;
+  background: rgba(255,255,255,0.85);
+  transition: var(--transition);
+}
+.hero-newsletter #email:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(210,105,30,0.15);
+}
+.hero-newsletter #submit {
+  background: none;
+  border: 1.5px solid var(--secondary);
+  color: var(--secondary);
+  padding: 12px 22px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.hero-newsletter #submit:hover {
+  background: var(--secondary);
+  color: #fff;
+}
+
+/* TRUST STRIP — full-width bar beneath the hero grid */
+.trust-strip {
+  max-width: 1180px;
+  margin: 64px auto 0;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius);
+  padding: 26px 40px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  backdrop-filter: blur(4px);
+}
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--secondary);
+  line-height: 1.35;
+  flex: 1 1 200px;
+}
+.trust-icon {
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+body.dark .trust-strip {
+  background: rgba(42,26,14,0.55);
+  border-color: rgba(74,46,16,0.6);
+}
+
+@media (max-width: 768px) {
+  .hero-cta-row { justify-content: center; }
+  .hero-icon-row { justify-content: center; }
+  .hero-newsletter { justify-content: center; margin-left: auto; margin-right: auto; }
+  .trust-strip {
+    justify-content: center;
+    text-align: left;
+    padding: 22px 24px;
+  }
+}
+
 #form {
   display: flex;
   justify-content: flex-start;
