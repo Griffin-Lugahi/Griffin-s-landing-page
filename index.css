@@ -436,9 +436,13 @@ body.dark #hero {
 }
 
 body.dark #email {
-  background: rgba(255,255,255,0.07);
+  background: #1a1008;
   border-color: #4a2e10;
   color: var(--text);
+}
+
+body.dark .hero-login-card {
+  background: var(--card-bg);
 }
 
 body.dark .cake-tag {
@@ -715,24 +719,7 @@ body.dark .cart-total-row {
 }
 
 .hero-emphasis {
-  position: relative;
-  display: inline-block;
-  color: var(--primary);
-}
-
-.hero-squiggle {
-  position: absolute;
-  left: 0;
-  bottom: -12px;
-  width: 100%;
-  height: 16px;
-  pointer-events: none;
-}
-.hero-squiggle path {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 5;
-  stroke-linecap: round;
+  color: var(--accent);
 }
 
 .hero-content p {
@@ -813,71 +800,223 @@ body.dark .cart-total-row {
 /* HERO — icon feature row (under the CTAs) */
 .hero-icon-row {
   display: flex;
-  gap: 30px;
-  margin-bottom: 26px;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 34px;
   flex-wrap: wrap;
 }
 .hero-icon-item {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--secondary);
   line-height: 1.3;
+  text-align: center;
 }
-.hero-icon-circle {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.15rem;
+.hero-icon-line {
+  width: 28px;
+  height: 28px;
+  color: var(--primary);
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(92,42,0,0.08);
+}
+.hero-icon-divider {
+  width: 1px;
+  align-self: stretch;
+  min-height: 46px;
+  background: rgba(92,42,0,0.15);
 }
 
-/* HERO — compact newsletter (secondary, below the icon row now) */
-.hero-newsletter {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-  max-width: 460px;
+body.dark .hero-icon-divider {
+  background: rgba(240,230,216,0.15);
 }
-.hero-newsletter #email {
-  flex: 1;
-  min-width: 200px;
-  padding: 12px 16px;
+
+/* HERO — floating "Welcome back" login card (sits over the photo) */
+.hero-login-card {
+  position: absolute;
+  top: 6%;
+  right: -7%;
+  width: 300px;
+  max-width: 86vw;
+  background: var(--card-bg);
+  border-radius: 22px;
+  box-shadow: var(--shadow-hov);
+  padding: 28px 24px;
+  z-index: 5;
+}
+.login-card-head {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.login-card-head h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--secondary);
+}
+.login-heart {
+  display: block;
+  color: var(--accent);
+  font-size: 1.05rem;
+  margin: 4px 0;
+}
+.login-card-head p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.login-field > svg:first-child {
+  position: absolute;
+  left: 14px;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.login-field input {
+  width: 100%;
+  padding: 12px 40px 12px 38px;
   border-radius: 30px;
-  border: 1.5px solid #ddd;
+  border: 1.5px solid #e0d0c4;
   font-family: inherit;
-  font-size: 0.88rem;
-  background: rgba(255,255,255,0.85);
+  font-size: 0.85rem;
+  color: var(--text);
+  background: var(--bg);
   transition: var(--transition);
 }
-.hero-newsletter #email:focus {
+.login-field input:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(210,105,30,0.15);
 }
-.hero-newsletter #submit {
+.pw-toggle {
+  position: absolute;
+  right: 12px;
   background: none;
-  border: 1.5px solid var(--secondary);
-  color: var(--secondary);
-  padding: 12px 22px;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  transition: color var(--transition);
+}
+.pw-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+.pw-toggle:hover { color: var(--primary); }
+
+.login-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  gap: 10px;
+}
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.login-remember input {
+  accent-color: var(--primary);
+}
+.login-forgot {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.login-forgot:hover { text-decoration: underline; }
+
+.login-submit {
+  font-size: 0.9rem;
+  padding: 12px;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin: 2px 0;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e8dccf;
+}
+
+.login-social {
+  display: flex;
+  gap: 10px;
+}
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
   border-radius: 30px;
+  border: 1.5px solid #e0d0c4;
+  background: none;
   font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text);
   cursor: pointer;
   transition: var(--transition);
 }
-.hero-newsletter #submit:hover {
-  background: var(--secondary);
-  color: #fff;
+.social-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.login-signup {
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.login-signup a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+.login-signup a:hover { text-decoration: underline; }
+
+body.dark .login-field input {
+  background: #1a1008;
+  border-color: #4a2e10;
+  color: var(--text);
+}
+body.dark .login-divider::before,
+body.dark .login-divider::after {
+  background: #4a2e10;
+}
+body.dark .social-btn {
+  border-color: #4a2e10;
 }
 
 /* TRUST STRIP — full-width bar beneath the hero grid */
@@ -914,63 +1053,24 @@ body.dark .trust-strip {
   border-color: rgba(74,46,16,0.6);
 }
 
+@media (min-width: 900px) {
+  .trust-item:not(:last-child) {
+    border-right: 1px solid rgba(92,42,0,0.12);
+    padding-right: 20px;
+  }
+  body.dark .trust-item:not(:last-child) {
+    border-right-color: rgba(240,230,216,0.12);
+  }
+}
+
 @media (max-width: 768px) {
   .hero-cta-row { justify-content: center; }
   .hero-icon-row { justify-content: center; }
-  .hero-newsletter { justify-content: center; margin-left: auto; margin-right: auto; }
   .trust-strip {
     justify-content: center;
     text-align: left;
     padding: 22px 24px;
   }
-}
-
-#form {
-  display: flex;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-#email {
-  padding: 14px 18px;
-  width: 300px;
-  border-radius: 30px;
-  border: 1.5px solid #ddd;
-  font-family: inherit;
-  font-size: 0.95rem;
-  background: rgba(255,255,255,0.9);
-  transition: var(--transition);
-}
-
-#email:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(210,105,30,0.15);
-}
-
-#submit {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  padding: 14px 30px;
-  border-radius: 30px;
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-#submit:hover {
-  background: var(--primary-dk);
-  transform: scale(1.04);
-}
-
-.hero-note {
-  font-size: 0.8rem;
-  opacity: 0.6;
 }
 
 /* HERO PHOTO CLUSTER */
@@ -983,72 +1083,24 @@ body.dark .trust-strip {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 420px;
+  min-height: 520px;
 }
 
-.hero-photo-stack {
+.hero-photo-frame {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  height: 100%;
+  min-height: 520px;
 }
 
 .hero-photo-main {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 5;
+  height: 100%;
+  min-height: 520px;
   object-fit: cover;
   border-radius: 28px;
   box-shadow: 0 24px 60px rgba(92,42,0,0.25);
-  transform: rotate(-3deg);
-  position: relative;
-  z-index: 2;
-}
-
-.hero-photo-accent {
-  position: absolute;
-  bottom: -6%;
-  left: -8%;
-  width: 36%;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 6px solid var(--bg);
-  box-shadow: 0 14px 34px rgba(92,42,0,0.22);
-  transform: rotate(6deg);
-  z-index: 3;
-}
-
-.hero-rating-chip {
-  position: absolute;
-  top: 6%;
-  right: -8%;
-  background: #fff;
-  border-radius: 16px;
-  padding: 10px 16px;
-  box-shadow: 0 10px 26px rgba(92,42,0,0.18);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  z-index: 4;
-  max-width: 200px;
-}
-.hero-rating-stars {
-  color: #f5a623;
-  font-size: 0.85rem;
-  letter-spacing: 1px;
-}
-.hero-rating-text {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--secondary);
-  white-space: nowrap;
-}
-
-body.dark .hero-rating-chip {
-  background: var(--card-bg);
-}
-body.dark .hero-rating-text {
-  color: var(--text);
 }
 
 /* CTA BAR */
@@ -1240,7 +1292,6 @@ body.dark #cta-bar {
 #back-to-top.visible {
   opacity: 1;
   transform: translateY(0);
-  pointer-events: all;
 }
 
 /* WHATSAPP BUTTON */
@@ -2314,22 +2365,22 @@ body.dark .confirm-wa-note {
     margin-right: auto;
   }
 
-  #form {
-    justify-content: center;
-  }
-
-  #email {
-    width: 100%;
-    max-width: 300px;
-  }
-
   .hero-visual {
-    min-height: 320px;
+    min-height: auto;
     order: -1;
+    flex-direction: column;
   }
 
-  .hero-photo-stack {
-    max-width: 280px;
+  .hero-photo-frame,
+  .hero-photo-main {
+    min-height: 340px;
+  }
+
+  .hero-login-card {
+    position: static;
+    width: 100%;
+    max-width: 340px;
+    margin: -36px auto 0;
   }
 
   #promo-banner {
