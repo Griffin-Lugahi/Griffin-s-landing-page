@@ -79,9 +79,10 @@ img { display: block; max-width: 100%; }
 }
 #header-img { width: 42px; }
 .logo-text {
-  font-size: 1.2rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--secondary);
   letter-spacing: -0.3px;
 }
 
@@ -92,17 +93,16 @@ img { display: block; max-width: 100%; }
 }
 .nav-link {
   text-decoration: none;
-  color: var(--primary);
-  font-weight: 600;
+  color: var(--text);
+  font-weight: 500;
   font-size: 0.9rem;
   padding: 7px 14px;
   border-radius: 30px;
-  transition: var(--transition);
+  transition: color 0.35s ease;
 }
 .nav-link:hover,
 .nav-link.active {
-  background: var(--accent);
-  color: #fff;
+  color: var(--primary);
 }
 
 .header-actions {
