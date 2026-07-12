@@ -1021,9 +1021,19 @@ body.dark .social-btn {
 }
 
 /* TRUST STRIP — full-width bar beneath the hero grid */
+/* TRUST BAR — separate section, pulled up to overlap the hero's
+   bottom edge so it visually reads as part of the same flow */
+#trust-bar {
+  position: relative;
+  z-index: 15;
+  padding: 0 24px;
+  margin-top: -56px;
+  margin-bottom: 40px;
+}
+
 .trust-strip {
   max-width: 1180px;
-  margin: 64px auto 0;
+  margin: 0 auto;
   background: rgba(255,255,255,0.55);
   border: 1px solid rgba(255,255,255,0.6);
   border-radius: var(--radius);
@@ -1067,6 +1077,10 @@ body.dark .trust-strip {
 @media (max-width: 768px) {
   .hero-cta-row { justify-content: center; }
   .hero-icon-row { justify-content: center; }
+  #trust-bar {
+    margin-top: -32px;
+    margin-bottom: 28px;
+  }
   .trust-strip {
     justify-content: center;
     text-align: left;
