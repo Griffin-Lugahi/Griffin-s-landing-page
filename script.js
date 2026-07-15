@@ -231,11 +231,17 @@ function loadCartState() {
   }
 }
 
+// CURRENCY FORMATTING
+// All prices on this site are in Kenyan Shillings (KES).
+function formatKES(amount) {
+  return `KSh ${Math.round(amount).toLocaleString('en-KE')}`;
+}
+
 // Available coupon codes
 const COUPONS = {
   SWEET15: { type: 'percent', value: 15, label: '15% off' },
   WELCOME10: { type: 'percent', value: 10, label: '10% off' },
-  SAVE5: { type: 'flat', value: 5, label: '$5 off' },
+  SAVE5: { type: 'flat', value: 500, label: 'KSh 500 off' },
 };
 
 // Minimum delivery date = tomorrow
@@ -248,7 +254,7 @@ function setMinDate() {
 function openModal(name, price) {
   pendingItem = { name, price };
   modalTitle.textContent  = name;
-  modalPrice.textContent  = `$${price}`;
+  modalPrice.textContent  = formatKES(price);
   step1.classList.remove('hidden');
   step2.classList.add('hidden');
   clearErrors();
@@ -352,14 +358,14 @@ function renderCart() {
       <div class="cart-item" data-name="${name}">
         <div class="cart-item-info">
           <p class="cart-item-name">${name}</p>
-          <p class="cart-item-price">$${price} each</p>
+          <p class="cart-item-price">${formatKES(price)} each</p>
         </div>
         <div class="cart-item-qty">
           <button class="qty-btn qty-dec" aria-label="Decrease quantity of ${name}">−</button>
           <span class="qty-num">${qty}</span>
           <button class="qty-btn qty-inc" aria-label="Increase quantity of ${name}">+</button>
         </div>
-        <span class="cart-item-subtotal">$${price * qty}</span>
+        <span class="cart-item-subtotal">${formatKES(price * qty)}</span>
         <button class="cart-item-remove" aria-label="Remove ${name} from cart">&times;</button>
       </div>`).join('');
   }
@@ -368,13 +374,13 @@ function renderCart() {
   const discount  = calcDiscount(subtotal);
   const total     = Math.max(0, subtotal - discount);
 
-  cartSubtotalEl.textContent = `$${subtotal}`;
-  cartTotalEl.textContent    = `$${total}`;
+  cartSubtotalEl.textContent = formatKES(subtotal);
+  cartTotalEl.textContent    = formatKES(total);
 
   if (appliedCoupon && discount > 0) {
     cartDiscountRow.classList.remove('hidden');
     cartDiscountLabel.textContent = `Discount (${appliedCoupon.code})`;
-    cartDiscountEl.textContent = `-$${discount}`;
+    cartDiscountEl.textContent = `-${formatKES(discount)}`;
   } else {
     cartDiscountRow.classList.add('hidden');
   }
@@ -551,7 +557,7 @@ document.getElementById('modal-submit').addEventListener('click', () => {
 
   const rows = [
     ['Cake',     itemName],
-    ['Price',    `$${price}`],
+    ['Price',    formatKES(price)],
     ['Name',     name],
     ['Phone',    phone],
     ['Delivery', address],
@@ -617,17 +623,17 @@ function buildWhatsAppMessage() {
   items.forEach(([name, { price, qty }]) => {
     const lineTotal = price * qty;
     subtotal += lineTotal;
-    msg += `• ${name} x${qty} — $${lineTotal}\n`;
+    msg += `• ${name} x${qty} — ${formatKES(lineTotal)}\n`;
   });
 
   const discount = calcDiscount(subtotal);
   const total = Math.max(0, subtotal - discount);
 
-  msg += `\nSubtotal: $${subtotal}`;
+  msg += `\nSubtotal: ${formatKES(subtotal)}`;
   if (appliedCoupon && discount > 0) {
-    msg += `\nCoupon (${appliedCoupon.code}): -$${discount}`;
+    msg += `\nCoupon (${appliedCoupon.code}): -${formatKES(discount)}`;
   }
-  msg += `\n*Total: $${total}*`;
+  msg += `\n*Total: ${formatKES(total)}*`;
   msg += "\n\nPlease confirm availability and delivery details. Thank you!";
   return msg;
 }
@@ -642,7 +648,7 @@ function buildOrderWhatsAppMessage(order) {
   let msg = "Hi SweetBite! I just placed an order — please confirm:\n\n";
   msg += `Order ID: ${order.id}\n`;
   msg += `Cake: ${order.cake}\n`;
-  msg += `Price: $${order.price}\n`;
+  msg += `Price: ${formatKES(order.price)}\n`;
   msg += `Name: ${order.name}\n`;
   msg += `Phone: ${order.phone}\n`;
   msg += `Delivery: ${order.address}\n`;
