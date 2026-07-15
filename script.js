@@ -203,6 +203,34 @@ let pendingItem = null;
 let lastOrder = null; // most recently placed order, for the "Track This Order" shortcut
 let appliedCoupon = null; // { code, type: 'percent'|'flat', value, label }
 
+// CART PERSISTENCE
+// Keeps the cart (and any applied coupon) across page refreshes/navigation
+// using localStorage, so an in-progress order doesn't just vanish.
+const CART_STORAGE_KEY = 'sweetbite_cart_state';
+
+function saveCartState() {
+  try {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ cart, appliedCoupon }));
+  } catch {
+    // Storage unavailable (private browsing, quota, etc.) — fail silently,
+    // the cart just won't persist for this session.
+  }
+}
+
+function loadCartState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_STORAGE_KEY));
+    if (saved && typeof saved.cart === 'object' && saved.cart !== null) {
+      Object.assign(cart, saved.cart);
+    }
+    if (saved && saved.appliedCoupon) {
+      appliedCoupon = saved.appliedCoupon;
+    }
+  } catch {
+    // Corrupted or missing data — start with an empty cart, no big deal.
+  }
+}
+
 // Available coupon codes
 const COUPONS = {
   SWEET15: { type: 'percent', value: 15, label: '15% off' },
@@ -360,6 +388,7 @@ function addToCart(name, price, qty = 1) {
   bumpCartCount();
   renderCart();
   syncWhatsAppBadge();
+  saveCartState();
 }
 
 // Open / close the dropdown
@@ -412,6 +441,7 @@ cartItemsList.addEventListener('click', (e) => {
   renderCart();
   updateCartCount();
   syncWhatsAppBadge();
+  saveCartState();
 });
 
 cartClearBtn.addEventListener('click', () => {
@@ -421,6 +451,7 @@ cartClearBtn.addEventListener('click', () => {
   renderCart();
   updateCartCount();
   syncWhatsAppBadge();
+  saveCartState();
   showToast('🗑️ Cart cleared');
 });
 
@@ -453,6 +484,7 @@ function applyCoupon() {
   couponApplied.classList.remove('hidden');
   couponAppliedText.textContent = `✅ ${code} applied — ${coupon.label}`;
   renderCart();
+  saveCartState();
   showToast(`🎉 Coupon ${code} applied!`);
 }
 
@@ -463,6 +495,7 @@ function removeCoupon(notify = true) {
   couponErrorEl.textContent = '';
   couponInput.classList.remove('invalid');
   renderCart();
+  saveCartState();
   if (notify) showToast('Coupon removed');
 }
 
@@ -557,8 +590,15 @@ document.getElementById('modal-track-btn').addEventListener('click', () => {
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// Initial render (empty cart state)
+// Initial render — restore any saved cart/coupon before first paint
+loadCartState();
+if (appliedCoupon) {
+  couponForm.classList.add('hidden');
+  couponApplied.classList.remove('hidden');
+  couponAppliedText.textContent = `✅ ${appliedCoupon.code} applied — ${appliedCoupon.label}`;
+}
 renderCart();
+updateCartCount();
 syncWhatsAppBadge();
 
 
