@@ -2,6 +2,7 @@
   --primary:    #d2691e;
   --primary-dk: #a0522d;
   --secondary:  #5c2a00;
+  --heading:    var(--secondary);
   --accent:     #ff7f50;
   --bg:         #fff8f4;
   --bg-alt:     #fff0e5;
@@ -82,7 +83,7 @@ img { display: block; max-width: 100%; }
   font-family: 'Playfair Display', serif;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   letter-spacing: -0.3px;
 }
 
@@ -184,7 +185,7 @@ img { display: block; max-width: 100%; }
 .cart-dropdown-header h4 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
 }
 #cart-dropdown-close {
   background: none;
@@ -216,7 +217,7 @@ img { display: block; max-width: 100%; }
 .cart-item-name {
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--heading);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -259,7 +260,7 @@ img { display: block; max-width: 100%; }
 .cart-item-subtotal {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   width: 44px;
   text-align: right;
   flex-shrink: 0;
@@ -380,7 +381,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   justify-content: space-between;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   font-size: 0.95rem;
   padding-top: 6px;
   border-top: 1px dashed #e0d0c4;
@@ -411,6 +412,7 @@ body.dark {
   --card-bg:    #2a1a0e;
   --text:       #f0e6d8;
   --text-muted: #a08060;
+  --heading:    #ffe0c2;
   --shadow:     0 4px 20px rgba(0,0,0,0.35);
   --shadow-hov: 0 10px 30px rgba(0,0,0,0.5);
 }
@@ -684,7 +686,7 @@ body.dark .cart-total-row {
   align-items: center;
   padding: 140px 24px 90px;
   background: #f8ede1;
-  color: var(--secondary);
+  color: var(--heading);
 }
 
 .hero-grid {
@@ -719,7 +721,7 @@ body.dark .cart-total-row {
   font-weight: 700;
   line-height: 1.15;
   margin-bottom: 20px;
-  color: var(--secondary);
+  color: var(--heading);
 }
 
 .hero-emphasis {
@@ -791,7 +793,7 @@ body.dark .cart-total-row {
 
 .hero-btn-ghost {
   background: none;
-  color: var(--secondary);
+  color: var(--heading);
   border: 1.5px solid var(--primary);
   padding: 15px 26px;
 }
@@ -826,7 +828,7 @@ body.dark .cart-total-row {
   gap: 10px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--heading);
   line-height: 1.3;
   text-align: center;
 }
@@ -868,7 +870,7 @@ body.dark .hero-icon-divider {
   font-family: 'Playfair Display', serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
 }
 .login-heart {
   display: block;
@@ -1086,7 +1088,7 @@ body.dark .social-btn {
 .trust-text strong {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
 }
 .trust-text small {
   font-size: 0.74rem;
@@ -1406,7 +1408,7 @@ section {
 .section-header h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   margin-bottom: 8px;
 }
 .section-header p {
@@ -1544,7 +1546,7 @@ section {
 .card-body h3 {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
 }
 
 .cake-desc {
@@ -1564,7 +1566,7 @@ section {
 .cake-price {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
 }
 
 .order-btn {
@@ -1835,7 +1837,7 @@ section {
   color: #fff;
 }
 .tracker-step.completed .tracker-label {
-  color: var(--secondary);
+  color: var(--heading);
 }
 .tracker-line {
   flex: 1;
@@ -1851,7 +1853,7 @@ section {
 .tracker-message {
   text-align: center;
   font-size: 0.86rem;
-  color: var(--secondary);
+  color: var(--heading);
   font-weight: 600;
   margin-top: 18px;
   padding: 0 12px;
@@ -1909,7 +1911,7 @@ body.dark .tracker-line {
 .modal-cake-name {
   font-size: 1.15rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   margin: 0 0 2px;
 }
 .modal-cake-price {
@@ -1934,7 +1936,7 @@ body.dark .tracker-line {
 .field-group label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--heading);
 }
 .optional {
   font-weight: 400;
@@ -2025,7 +2027,7 @@ body.dark .tracker-line {
   margin: 0 24px 16px;
 }
 .confirm-order-id strong {
-  color: var(--secondary);
+  color: var(--heading);
   letter-spacing: 0.03em;
 }
 
@@ -2047,7 +2049,7 @@ body.dark .tracker-line {
 .confirm-wa-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   margin-bottom: 2px;
 }
 .confirm-wa-sub {
@@ -2081,7 +2083,7 @@ body.dark .confirm-wa-note {
   text-align: center;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   margin: 0 0 4px;
 }
 .confirm-sub {
@@ -2111,7 +2113,7 @@ body.dark .confirm-wa-note {
   flex-shrink: 0;
 }
 .confirm-row span:last-child {
-  color: var(--secondary);
+  color: var(--heading);
   font-weight: 600;
   text-align: right;
 }
@@ -2189,7 +2191,7 @@ body.dark .confirm-wa-note {
 .testi-name {
   font-size: 0.88rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   margin: 0;
 }
 .testi-role {
@@ -2237,7 +2239,7 @@ body.dark .confirm-wa-note {
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--secondary);
+  color: var(--heading);
 }
 .faq-icon {
   flex-shrink: 0;
@@ -2315,7 +2317,7 @@ body.dark .confirm-wa-note {
 .contact-info-row h4 {
   font-size: 0.92rem;
   font-weight: 700;
-  color: var(--secondary);
+  color: var(--heading);
   margin-bottom: 2px;
 }
 .contact-info-row p {
