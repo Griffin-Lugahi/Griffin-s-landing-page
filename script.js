@@ -10,6 +10,48 @@ function showToast(message, type = 'success') {
 }
 
 
+// FOCUS TRAP (for modals / dropdowns)
+// Keeps keyboard Tab/Shift+Tab cycling inside an open overlay instead of
+// leaking into page content hidden behind it, and restores focus to
+// whatever triggered the overlay once it closes. Stack-based so opening
+// one overlay from inside another (e.g. order modal -> track modal)
+// unwinds correctly.
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea, input:not([disabled]), select, [tabindex]:not([tabindex="-1"])';
+const focusTrapStack = [];
+
+function pushFocusTrap(container) {
+  const previouslyFocused = document.activeElement;
+
+  function handleKeydown(e) {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR))
+      .filter(el => el.offsetParent !== null);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last  = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  container.addEventListener('keydown', handleKeydown);
+  focusTrapStack.push({ container, handleKeydown, previouslyFocused });
+}
+
+function popFocusTrap() {
+  const trap = focusTrapStack.pop();
+  if (!trap) return;
+  trap.container.removeEventListener('keydown', trap.handleKeydown);
+  if (trap.previouslyFocused && typeof trap.previouslyFocused.focus === 'function') {
+    trap.previouslyFocused.focus();
+  }
+}
+
+
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -336,12 +378,16 @@ function openModal(name, price) {
   document.getElementById('order-notes').value   = '';
   setMinDate();
   overlay.classList.add('open');
-  setTimeout(() => document.getElementById('order-name').focus(), 250);
+  setTimeout(() => {
+    document.getElementById('order-name').focus();
+    pushFocusTrap(document.getElementById('order-modal'));
+  }, 250);
 }
 
 function closeModal() {
   overlay.classList.remove('open');
   pendingItem = null;
+  popFocusTrap();
 }
 
 function clearErrors() {
@@ -472,11 +518,13 @@ function addToCart(name, price, qty = 1) {
 function openCartDropdown() {
   cartDropdown.classList.add('open');
   cartBtn.setAttribute('aria-expanded', 'true');
+  pushFocusTrap(cartDropdown);
 }
 
 function closeCartDropdown() {
   cartDropdown.classList.remove('open');
   cartBtn.setAttribute('aria-expanded', 'false');
+  popFocusTrap();
 }
 
 cartBtn.addEventListener('click', (e) => {
@@ -961,13 +1009,17 @@ function openTrackModal() {
   trackStepResult.classList.add('hidden');
   trackErrorEl.textContent = '';
   trackInput.classList.remove('invalid');
-  setTimeout(() => trackInput.focus(), 250);
+  setTimeout(() => {
+    trackInput.focus();
+    pushFocusTrap(document.getElementById('track-modal'));
+  }, 250);
 }
 
 function closeTrackModal() {
   trackOverlay.classList.remove('open');
   clearInterval(trackerPollInterval);
   trackerPollInterval = null;
+  popFocusTrap();
 }
 
 function renderTracker(order) {
