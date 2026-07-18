@@ -425,6 +425,16 @@ document.querySelectorAll('.order-btn').forEach(btn => {
   });
 });
 
+// Quick-add buttons → skip the modal, add straight to cart
+document.querySelectorAll('.quick-add-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const name  = btn.dataset.name;
+    const price = parseInt(btn.dataset.price);
+    addToCart(name, price);
+    showToast(`🛒 Added ${name} to cart`);
+  });
+});
+
 // --- Cart dropdown rendering & cart state helpers ---
 
 function cartItemCount() {
