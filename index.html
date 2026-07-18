@@ -29,7 +29,9 @@
 </head>
 <body>
 
-  <div id="toast"></div>
+  <a href="#hero" class="skip-link">Skip to main content</a>
+
+  <div id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <header id="header">
     <div class="logo">
@@ -311,9 +313,20 @@
       <p>Handcrafted for every occasion — order your favourite today.</p>
     </div>
 
+    <div class="cake-filter-bar" role="group" aria-label="Filter cakes by category">
+      <button class="cake-filter-btn active" data-filter="All">All</button>
+      <button class="cake-filter-btn" data-filter="Chocolate">Chocolate</button>
+      <button class="cake-filter-btn" data-filter="Fruity">Fruity</button>
+      <button class="cake-filter-btn" data-filter="Citrus">Citrus</button>
+      <button class="cake-filter-btn" data-filter="Premium">Premium</button>
+      <button class="cake-filter-btn" data-filter="Classic">Classic</button>
+      <button class="cake-filter-btn" data-filter="Caramel">Caramel</button>
+    </div>
+    <p id="cake-filter-empty" class="cake-filter-empty hidden">No cakes match this filter yet — check back soon!</p>
+
     <div class="pricing-container">
 
-      <div class="price-card">
+      <div class="price-card" data-tag="Chocolate">
         <div class="card-img-wrap">
           <span class="badge popular">Popular</span>
           <img class="chocolate"
@@ -333,7 +346,7 @@ alt="Chocolate Dream cake">
         </div>
       </div>
 
-      <div class="price-card">
+      <div class="price-card" data-tag="Fruity">
         <div class="card-img-wrap">
           <img src="https://cdn.pixabay.com/photo/2017/08/06/23/14/strawberry-2597402_640.jpg" alt="Strawberry Bliss cake"/>
         </div>
@@ -348,7 +361,7 @@ alt="Chocolate Dream cake">
         </div>
       </div>
 
-      <div class="price-card">
+      <div class="price-card" data-tag="Citrus">
         <div class="card-img-wrap">
           <span class="badge new-badge">New</span>
           <img src="https://cdn.pixabay.com/photo/2018/01/04/11/40/cake-3060458_640.jpg" 
@@ -368,7 +381,7 @@ alt="Chocolate Dream cake">
         </div>
       </div>
 
-      <div class="price-card">
+      <div class="price-card" data-tag="Premium">
         <div class="card-img-wrap">
           <img 
   src="https://images.pexels.com/photos/34596959/pexels-photo-34596959.jpeg?auto=compress&cs=tinysrgb&w=600" 
@@ -386,7 +399,7 @@ alt="Chocolate Dream cake">
         </div>
       </div>
 
-      <div class="price-card">
+      <div class="price-card" data-tag="Classic">
         <div class="card-img-wrap">
           <img src="https://cdn.pixabay.com/photo/2020/07/06/14/45/cake-5377289_640.jpg"
           width="300"
@@ -403,7 +416,7 @@ alt="Chocolate Dream cake">
         </div>
       </div>
 
-      <div class="price-card">
+      <div class="price-card" data-tag="Caramel">
         <div class="card-img-wrap">
           <span class="badge new-badge">New</span>
           <img src="https://images.unsplash.com/photo-1547414368-ac947d00b91d?w=400&q=80" alt="Caramel Crunch cake"/>
@@ -867,7 +880,7 @@ alt="Chocolate Dream cake">
 </div>
 
 <!-- GALLERY LIGHTBOX -->
-<div id="lightbox">
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Image gallery viewer">
   <button id="lightbox-close" aria-label="Close">&times;</button>
   <button id="lightbox-prev" aria-label="Previous image">‹</button>
   <div>
