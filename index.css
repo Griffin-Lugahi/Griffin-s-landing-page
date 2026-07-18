@@ -25,6 +25,26 @@
 
 html { scroll-behavior: smooth; }
 
+/* SKIP LINK — hidden until keyboard-focused, lets keyboard/screen-reader
+   users jump straight past the header/nav to the main content */
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 16px;
+  z-index: 3000;
+  background: var(--secondary);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 16px;
+}
+
 body {
   font-family: "Poppins", sans-serif;
   background: var(--bg);
@@ -1462,6 +1482,51 @@ section {
 }
 
 /*  CAKE COLLECTION / PRICING */
+
+.cake-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 1020px;
+  margin: 0 auto 36px;
+}
+.cake-filter-btn {
+  background: var(--card-bg);
+  border: 1.5px solid #e0d0c4;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.cake-filter-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.cake-filter-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+body.dark .cake-filter-btn {
+  border-color: #4a2e10;
+}
+
+.cake-filter-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  max-width: 1020px;
+  margin: 0 auto 24px;
+}
+
+.price-card.filter-hidden {
+  display: none;
+}
 
    .pricing-container {
   display: grid;
