@@ -1363,6 +1363,7 @@ body.dark #cta-bar {
 #back-to-top.visible {
   opacity: 1;
   transform: translateY(0);
+  pointer-events: all;
 }
 
 /* WHATSAPP BUTTON */
