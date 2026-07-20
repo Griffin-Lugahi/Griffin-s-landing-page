@@ -26,6 +26,51 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
   <link rel="icon" href="favicon.ico">
+
+  <!-- Structured data: helps Google show hours, rating, address, price
+       range directly in search results instead of just a plain link -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Bakery",
+    "name": "SweetBite Cakes",
+    "image": "https://images.unsplash.com/photo-1584158531316-56eabe3182c7?w=1200&h=630&fit=crop&q=80",
+    "url": "https://sweetbitecakes.example.com",
+    "telephone": "+254114593974",
+    "priceRange": "KSh 3,600 - KSh 12,900",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Westlands Square, Ring Road",
+      "addressLocality": "Nairobi",
+      "addressCountry": "KE"
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+        "opens": "08:00",
+        "closes": "19:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Sunday",
+        "opens": "10:00",
+        "closes": "16:00"
+      }
+    ],
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "500"
+    },
+    "sameAs": [
+      "https://wa.me/254114593974",
+      "https://instagram.com/sweetbites_official254",
+      "https://twitter.com/sweetbitecakes",
+      "https://tiktok.com/@sweetbitecakes"
+    ]
+  }
+  </script>
 </head>
 <body>
 
