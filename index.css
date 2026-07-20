@@ -98,7 +98,9 @@ img { display: block; max-width: 100%; }
   align-items: center;
   gap: 10px;
 }
-#header-img { width: 42px; }
+#header-img { width: 42px; height: 42px; object-fit: contain; }
+
+.footer-brand img { width: 36px; height: 36px; object-fit: contain; }
 .logo-text {
   font-family: 'Playfair Display', serif;
   font-size: 1.3rem;
