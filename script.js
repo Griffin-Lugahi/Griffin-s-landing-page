@@ -57,47 +57,6 @@ function isValidEmail(email) {
 }
 
 
-// ACCESSIBILITY — modal focus trapping
-// Keeps Tab/Shift+Tab cycling inside an open modal instead of leaking
-// focus out into the page behind it, and returns focus to whatever
-// triggered the modal once it's closed.
-let lastFocusedBeforeOverlay = null;
-
-function rememberFocus() {
-  lastFocusedBeforeOverlay = document.activeElement;
-}
-
-function restoreFocus() {
-  if (lastFocusedBeforeOverlay && typeof lastFocusedBeforeOverlay.focus === 'function') {
-    lastFocusedBeforeOverlay.focus();
-  }
-}
-
-function getFocusableElements(container) {
-  return Array.from(
-    container.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-    )
-  ).filter(el => el.offsetParent !== null);
-}
-
-function trapFocus(overlayEl, panelEl) {
-  overlayEl.addEventListener('keydown', (e) => {
-    if (e.key !== 'Tab' || !overlayEl.classList.contains('open')) return;
-    const focusable = getFocusableElements(panelEl);
-    if (focusable.length === 0) return;
-    const first = focusable[0];
-    const last  = focusable[focusable.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      first.focus();
-    }
-  });
-}
-
 // HERO LOGIN CARD
 // NOTE: This is a static demo site with no backend/auth system, so the
 // "Login" card is UI-only. Submitting it just nudges people toward
