@@ -23,7 +23,7 @@
   <meta name="twitter:image" content="https://images.unsplash.com/photo-1584158531316-56eabe3182c7?w=1200&h=630&fit=crop&q=80" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&family=Fredoka:wght@500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="index.css">
   <link rel="icon" href="favicon.ico">
 
@@ -164,15 +164,25 @@
   </header>
 
   <section id="hero">
+    <div class="hero-split-bg" aria-hidden="true">
+      <div class="hero-split-left"></div>
+      <div class="hero-split-right"></div>
+    </div>
+    <span class="hero-vertical-text" aria-hidden="true">SweetBite</span>
+    <span class="hero-decor-circle" aria-hidden="true"></span>
+
     <div class="hero-grid">
+      <div class="hero-visual">
+        <img class="hero-photo-main" src="https://images.unsplash.com/photo-1584158531316-56eabe3182c7?w=900&q=80" width="900" height="1125" alt="An elegant white wedding cake decorated with peach and white flowers" loading="lazy" />
+      </div>
+
       <div class="hero-content">
         <span class="hero-script">Made with love <span class="heart">♡</span></span>
-        <h1>Every cake<br>tells a <span class="hero-emphasis">story.</span></h1>
-        <span class="hero-divider"></span>
+        <h1>Every cake<br><span class="hero-outline">tells a story.</span></h1>
         <p>Indulge in handcrafted cakes made with the finest ingredients for life's sweetest celebrations.</p>
 
         <div class="hero-cta-row">
-          <a href="#pricing" class="hero-btn hero-btn-primary">Explore Cakes →</a>
+          <a href="#pricing" class="hero-btn hero-btn-primary">Explore Cakes</a>
           <a href="https://wa.me/254114593974" target="_blank" rel="noopener" class="hero-btn hero-btn-ghost">
             <span class="hero-btn-play"><svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></span> Order via WhatsApp
           </a>
@@ -208,60 +218,6 @@
             </svg>
             <span>Fast &amp; Safe<br>Delivery</span>
           </div>
-        </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="hero-photo-frame">
-          <img class="hero-photo-main" src="https://images.unsplash.com/photo-1584158531316-56eabe3182c7?w=900&q=80" width="900" height="1125" alt="An elegant white wedding cake decorated with peach and white flowers" loading="lazy" />
-        </div>
-
-        <div class="hero-login-card">
-          <div class="login-card-head">
-            <h3>Welcome back</h3>
-            <span class="login-heart">♡</span>
-            <p>Login to continue your sweet journey</p>
-          </div>
-
-          <form id="hero-login-form" class="login-form">
-            <div class="login-field">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>
-              <input type="email" id="hero-login-email" name="email" placeholder="Email address" required />
-            </div>
-
-            <div class="login-field">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-              <input type="password" id="hero-login-password" name="password" placeholder="Password" required />
-              <button type="button" id="hero-pw-toggle" class="pw-toggle" aria-label="Show password">
-                <svg id="hero-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-
-            <div class="login-row">
-              <label class="login-remember">
-                <input type="checkbox" id="hero-login-remember" name="remember" />
-                Remember me
-              </label>
-              <a href="#" class="login-forgot">Forgot password?</a>
-            </div>
-
-            <button type="submit" class="btn-primary login-submit">Login</button>
-
-            <div class="login-divider"><span>or continue with</span></div>
-
-            <div class="login-social">
-              <button type="button" class="social-btn">
-                <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.47a5.53 5.53 0 0 1-2.4 3.63v3h3.88c2.27-2.09 3.57-5.17 3.57-8.82Z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.95-2.91l-3.88-3c-1.08.72-2.46 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.26v3.11A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.61H1.26A12 12 0 0 0 0 12c0 1.94.46 3.77 1.26 5.39l4.01-3.11Z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.6 4.58 1.79l3.44-3.44C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.69 1.26 6.61l4.01 3.11C6.22 6.88 8.87 4.77 12 4.77Z"/></svg>
-                Google
-              </button>
-              <button type="button" class="social-btn">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M16.365 1.43c0 1.14-.462 2.15-1.217 2.91-.803.812-2.09 1.44-3.18 1.36-.14-1.1.44-2.24 1.19-2.97.81-.8 2.19-1.39 3.21-1.3ZM20.9 17.4c-.55 1.27-.81 1.84-1.52 2.96-.99 1.56-2.38 3.5-4.11 3.52-1.53.02-1.92-.99-3.99-.98-2.07.01-2.5 1-4.03.98-1.73-.02-3.05-1.77-4.04-3.33-2.77-4.34-3.06-9.44-1.35-12.15 1.21-1.92 3.13-3.05 4.93-3.05 1.83 0 2.98 1.01 4.5 1.01 1.47 0 2.36-1.01 4.49-1.01 1.6 0 3.29.87 4.5 2.37-3.96 2.17-3.32 7.83.62 9.68Z"/></svg>
-                Apple
-              </button>
-            </div>
-
-            <p class="login-signup">Don't have an account? <a href="#pricing">Sign up</a></p>
-          </form>
         </div>
       </div>
     </div>
