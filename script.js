@@ -57,39 +57,6 @@ function isValidEmail(email) {
 }
 
 
-// HERO LOGIN CARD
-// NOTE: This is a static demo site with no backend/auth system, so the
-// "Login" card is UI-only. Submitting it just nudges people toward
-// ordering via WhatsApp instead of pretending to sign them in.
-const heroLoginForm  = document.getElementById('hero-login-form');
-const heroPwToggle   = document.getElementById('hero-pw-toggle');
-const heroPwInput    = document.getElementById('hero-login-password');
-const heroEyeIcon    = document.getElementById('hero-eye-icon');
-
-if (heroPwToggle && heroPwInput) {
-  heroPwToggle.addEventListener('click', () => {
-    const showing = heroPwInput.type === 'text';
-    heroPwInput.type = showing ? 'password' : 'text';
-    heroPwToggle.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
-    heroEyeIcon.innerHTML = showing
-      ? '<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/>'
-      : '<path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a20.6 20.6 0 0 1 4.22-5.06M9.9 4.24A9.7 9.7 0 0 1 12 4c7 0 11 7 11 7a20.6 20.6 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
-  });
-}
-
-if (heroLoginForm) {
-  heroLoginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    showToast('💡 Accounts are coming soon — order via WhatsApp for now!');
-  });
-}
-
-document.querySelectorAll('.hero-login-card .social-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    showToast('💡 Social login is coming soon — order via WhatsApp for now!');
-  });
-});
-
 // PROMO BANNER
 const promoBanner = document.getElementById('promo-banner');
 const promoClose   = document.getElementById('promo-close');
