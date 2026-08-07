@@ -740,7 +740,6 @@ body.dark .cart-total-row {
   letter-spacing: 0.04em;
   color: transparent;
   -webkit-text-stroke: 2px rgba(255,255,255,0.32);
-  text-stroke: 2px rgba(255,255,255,0.32);
   white-space: nowrap;
   z-index: 1;
   pointer-events: none;
@@ -797,7 +796,6 @@ body.dark .hero-decor-circle {
 .hero-outline {
   color: transparent;
   -webkit-text-stroke: 1.5px var(--accent);
-  text-stroke: 1.5px var(--accent);
 }
 
 .hero-content p {
