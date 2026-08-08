@@ -730,13 +730,14 @@ body.dark .cart-total-row {
 /* HERO — big rotated outline word on the dark panel */
 .hero-vertical-text {
   position: absolute;
-  left: 2%;
+  left: 150px;
   bottom: 6%;
   transform: rotate(-90deg);
   transform-origin: left bottom;
   font-family: 'Playfair Display', serif;
   font-weight: 800;
   font-size: clamp(3.5rem, 9vh, 6.5rem);
+  line-height: 1;
   letter-spacing: 0.04em;
   color: transparent;
   -webkit-text-stroke: 2.5px rgba(255,255,255,0.5);
