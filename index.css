@@ -746,21 +746,6 @@ body.dark .cart-total-row {
   pointer-events: none;
 }
 
-/* HERO — soft decorative circle behind the headline */
-.hero-decor-circle {
-  position: absolute;
-  top: 14%;
-  right: 6%;
-  width: 340px;
-  height: 340px;
-  max-width: 40vw;
-  max-height: 40vw;
-  border-radius: 50%;
-  background: rgba(92,42,0,0.07);
-  z-index: 0;
-  pointer-events: none;
-}
-
 /* HERO — small "SweetBites" corner wordmark, top-right */
 .hero-brandmark {
   position: absolute;
@@ -783,9 +768,6 @@ body.dark .cart-total-row {
 
 body.dark .hero-split-right {
   background: #1a0a1a;
-}
-body.dark .hero-decor-circle {
-  background: rgba(255,224,194,0.06);
 }
 
 .hero-grid {
@@ -2473,8 +2455,7 @@ body.dark .confirm-wa-note {
     margin: 0 auto;
   }
 
-  .hero-vertical-text,
-  .hero-decor-circle {
+  .hero-vertical-text {
     display: none;
   }
 
