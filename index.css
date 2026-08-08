@@ -736,10 +736,10 @@ body.dark .cart-total-row {
   transform-origin: left bottom;
   font-family: 'Playfair Display', serif;
   font-weight: 800;
-  font-size: 4.5rem;
+  font-size: clamp(3.5rem, 9vh, 6.5rem);
   letter-spacing: 0.04em;
   color: transparent;
-  -webkit-text-stroke: 2px rgba(255,255,255,0.32);
+  -webkit-text-stroke: 2.5px rgba(255,255,255,0.5);
   white-space: nowrap;
   z-index: 1;
   pointer-events: none;
