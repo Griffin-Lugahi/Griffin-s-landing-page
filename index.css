@@ -760,6 +760,26 @@ body.dark .cart-total-row {
   pointer-events: none;
 }
 
+/* HERO — small "SweetBites" corner wordmark, top-right */
+.hero-brandmark {
+  position: absolute;
+  top: 3%;
+  right: 6%;
+  z-index: 3;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: var(--heading);
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .hero-brandmark {
+    display: none;
+  }
+}
+
 body.dark .hero-split-right {
   background: #1a0a1a;
 }
@@ -1088,6 +1108,7 @@ body.dark .trust-strip {
   align-items: center;
   justify-content: center;
   min-height: 480px;
+  padding-left: 6%;
 }
 
 .hero-photo-main {
@@ -2443,6 +2464,7 @@ body.dark .confirm-wa-note {
     min-height: auto;
     order: -1;
     flex-direction: column;
+    padding-left: 0;
   }
 
   .hero-photo-main {
