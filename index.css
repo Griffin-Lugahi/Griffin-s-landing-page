@@ -731,7 +731,7 @@ body.dark .cart-total-row {
 .hero-vertical-text {
   position: absolute;
   left: 80px;
-  bottom: 6%;
+  bottom: 30%;
   transform: rotate(-90deg);
   transform-origin: left bottom;
   font-family: 'Playfair Display', serif;
@@ -798,6 +798,7 @@ body.dark .hero-split-right {
 .hero-outline {
   color: transparent;
   -webkit-text-stroke: 1.5px var(--accent);
+  
 }
 
 .hero-content p {
