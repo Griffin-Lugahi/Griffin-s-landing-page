@@ -798,7 +798,6 @@ body.dark .hero-split-right {
 .hero-outline {
   color: transparent;
   -webkit-text-stroke: 1.5px var(--accent);
-  
 }
 
 .hero-content p {
