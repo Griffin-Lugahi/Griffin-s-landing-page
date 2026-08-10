@@ -734,10 +734,10 @@ const header = document.getElementById('header');
 
 window.addEventListener('scroll', () => {
   if (window.scrollY > 20) {
-    header.style.background   = 'rgba(255, 248, 244, 1)';
+    header.style.background   = 'rgba(61, 36, 24, 1)';
     header.style.boxShadow    = '0 4px 16px rgba(0,0,0,0.12)';
   } else {
-    header.style.background   = 'rgba(255, 248, 244, 0.96)';
+    header.style.background   = 'rgba(61, 36, 24, 0.96)';
     header.style.boxShadow    = '0 2px 12px rgba(0,0,0,0.08)';
   }
 }, { passive: true });
