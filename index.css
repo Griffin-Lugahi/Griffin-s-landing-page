@@ -80,7 +80,7 @@ img { display: block; max-width: 100%; }
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(255, 248, 244, 0.96);
+  background: rgba(61, 36, 24, 0.96);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -105,7 +105,7 @@ img { display: block; max-width: 100%; }
   font-family: 'Playfair Display', serif;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--heading);
+  color: #fff8f2;
   letter-spacing: -0.3px;
 }
 
@@ -116,7 +116,7 @@ img { display: block; max-width: 100%; }
 }
 .nav-link {
   text-decoration: none;
-  color: var(--text);
+  color: #fff8f2;
   font-weight: 500;
   font-size: 0.9rem;
   padding: 7px 14px;
@@ -2396,7 +2396,7 @@ body.dark .confirm-wa-note {
     top: 72px;
     left: 0;
     width: 100%;
-    background: rgba(255, 248, 244, 0.98);
+    background: rgba(61, 36, 24, 0.98);
     padding: 16px 20px 20px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     border-bottom-left-radius: var(--radius);
