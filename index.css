@@ -2000,6 +2000,45 @@ body.dark .tracker-line {
   font-weight: 400;
   color: var(--text-muted);
 }
+
+/* CAKE CUSTOMIZATION — size / frosting pills in the order modal */
+.option-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.option-pill {
+  background: none;
+  border: 1.5px solid #e0d0c4;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 30px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: var(--transition);
+}
+.option-pill:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.option-pill.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.option-pill-addon {
+  font-size: 0.72rem;
+  opacity: 0.8;
+}
+body.dark .option-pill {
+  border-color: #4a2e10;
+}
+
 .field-group input,
 .field-group textarea {
   padding: 11px 14px;
