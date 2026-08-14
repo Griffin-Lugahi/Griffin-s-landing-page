@@ -426,19 +426,122 @@ function validateForm() {
 
 // Order Now buttons → open modal
 document.querySelectorAll('.order-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
     openModal(btn.dataset.name, parseInt(btn.dataset.price));
   });
 });
 
 // Quick-add buttons → skip the modal, add straight to cart
 document.querySelectorAll('.quick-add-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
     const name  = btn.dataset.name;
     const price = parseInt(btn.dataset.price);
     addToCart(name, price);
     showToast(`🛒 Added ${name} to cart`);
   });
+});
+
+// PRODUCT QUICK VIEW
+// Clicking anywhere on a cake card (outside its buttons) opens a larger
+// preview with more photos and the full description.
+const quickviewOverlay  = document.getElementById('quickview-overlay');
+const quickviewModal    = document.getElementById('quickview-modal');
+const quickviewImg      = document.getElementById('quickview-img');
+const quickviewDots     = document.getElementById('quickview-dots');
+const quickviewTag      = document.getElementById('quickview-tag');
+const quickviewTitle    = document.getElementById('quickview-title');
+const quickviewPrice    = document.getElementById('quickview-price');
+const quickviewDesc     = document.getElementById('quickview-desc');
+const quickviewAddCart  = document.getElementById('quickview-add-cart');
+const quickviewOrderNow = document.getElementById('quickview-order-now');
+const quickviewPrev     = document.getElementById('quickview-prev');
+const quickviewNext     = document.getElementById('quickview-next');
+
+let quickviewImages = [];
+let quickviewIndex  = 0;
+let quickviewItem   = null; // { name, price }
+
+function renderQuickviewImage() {
+  quickviewImg.src = quickviewImages[quickviewIndex];
+  quickviewDots.querySelectorAll('.quickview-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === quickviewIndex);
+  });
+}
+
+function showQuickviewImage(delta) {
+  quickviewIndex = (quickviewIndex + delta + quickviewImages.length) % quickviewImages.length;
+  renderQuickviewImage();
+}
+
+function openQuickview(card) {
+  const name     = card.querySelector('h3').textContent.trim();
+  const price    = parseInt(card.querySelector('.order-btn').dataset.price);
+  const tag      = card.querySelector('.cake-tag')?.textContent.trim() || '';
+  const fullDesc = card.dataset.fullDesc || card.querySelector('.cake-desc')?.textContent.trim() || '';
+  quickviewImages = (card.dataset.images || '').split(',').filter(Boolean);
+  if (quickviewImages.length === 0) {
+    const fallbackImg = card.querySelector('.card-img-wrap img');
+    if (fallbackImg) quickviewImages = [fallbackImg.src];
+  }
+  quickviewIndex = 0;
+  quickviewItem  = { name, price };
+
+  quickviewTag.textContent   = tag;
+  quickviewTitle.textContent = name;
+  quickviewPrice.textContent = formatKES(price);
+  quickviewDesc.textContent  = fullDesc;
+
+  quickviewDots.innerHTML = quickviewImages
+    .map((_, i) => `<button type="button" class="quickview-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Photo ${i + 1}"></button>`)
+    .join('');
+  const multiplePhotos = quickviewImages.length > 1;
+  quickviewPrev.style.display = multiplePhotos ? 'flex' : 'none';
+  quickviewNext.style.display = multiplePhotos ? 'flex' : 'none';
+  quickviewDots.style.display = multiplePhotos ? 'flex' : 'none';
+
+  renderQuickviewImage();
+  quickviewOverlay.classList.add('open');
+  pushFocusTrap(quickviewModal);
+}
+
+function closeQuickview() {
+  quickviewOverlay.classList.remove('open');
+  popFocusTrap();
+}
+
+document.querySelectorAll('.price-card').forEach(card => {
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('button')) return;
+    openQuickview(card);
+  });
+});
+
+document.getElementById('quickview-close').addEventListener('click', closeQuickview);
+quickviewOverlay.addEventListener('click', e => { if (e.target === quickviewOverlay) closeQuickview(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQuickview(); });
+
+quickviewPrev.addEventListener('click', () => showQuickviewImage(-1));
+quickviewNext.addEventListener('click', () => showQuickviewImage(1));
+quickviewDots.addEventListener('click', (e) => {
+  const dot = e.target.closest('.quickview-dot');
+  if (!dot) return;
+  quickviewIndex = parseInt(dot.dataset.index);
+  renderQuickviewImage();
+});
+
+quickviewAddCart.addEventListener('click', () => {
+  if (!quickviewItem) return;
+  addToCart(quickviewItem.name, quickviewItem.price);
+  showToast(`🛒 Added ${quickviewItem.name} to cart`);
+  closeQuickview();
+});
+
+quickviewOrderNow.addEventListener('click', () => {
+  if (!quickviewItem) return;
+  closeQuickview();
+  openModal(quickviewItem.name, quickviewItem.price);
 });
 
 // --- Cart dropdown rendering & cart state helpers ---
