@@ -359,9 +359,10 @@
 
     <div class="pricing-container">
 
-      <div class="price-card" data-tag="Chocolate">
+      <div class="price-card" data-tag="Chocolate" data-images="https://images.unsplash.com/photo-1535911765168-1fafc87dcfa3?w=800&q=80,https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80" data-full-desc="Layers of moist Belgian chocolate sponge, filled and finished with a silky dark chocolate ganache, topped with a glossy drip and a scatter of chocolate shards and truffles. A rich, indulgent centerpiece for any celebration.">
         <div class="card-img-wrap">
           <span class="badge popular">Popular</span>
+          <span class="card-view-hint">🔍 Quick view</span>
           <img class="chocolate" src="https://images.unsplash.com/photo-1535911765168-1fafc87dcfa3?w=600&q=80" width="600" height="450" alt="Chocolate Dream cake">
         </div>
 
@@ -381,8 +382,9 @@
         </div>
       </div>
 
-      <div class="price-card" data-tag="Fruity">
+      <div class="price-card" data-tag="Fruity" data-images="https://cdn.pixabay.com/photo/2017/08/06/23/14/strawberry-2597402_640.jpg,https://images.unsplash.com/photo-1535254973040-607b474cb50d?w=800&q=80" data-full-desc="A light vanilla cream sponge layered with fresh strawberries and a delicate whipped cream frosting. Bright, fruity, and not overly sweet — a favourite for spring birthdays and anniversaries.">
         <div class="card-img-wrap">
+          <span class="card-view-hint">🔍 Quick view</span>
           <img src="https://cdn.pixabay.com/photo/2017/08/06/23/14/strawberry-2597402_640.jpg" width="640" height="480" alt="Strawberry Bliss cake"/>
         </div>
         <div class="card-body">
@@ -401,9 +403,10 @@
         </div>
       </div>
 
-      <div class="price-card" data-tag="Citrus">
+      <div class="price-card" data-tag="Citrus" data-images="https://cdn.pixabay.com/photo/2018/01/04/11/40/cake-3060458_640.jpg,https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80" data-full-desc="Buttery velvet crumb folded with tangy lemon curd and finished with a light lemon glaze. Refreshing and citrus-forward — the cake we recommend when you want something a little different from chocolate or vanilla.">
         <div class="card-img-wrap">
           <span class="badge new-badge">New</span>
+          <span class="card-view-hint">🔍 Quick view</span>
           <img src="https://cdn.pixabay.com/photo/2018/01/04/11/40/cake-3060458_640.jpg" width="640" height="480" alt="Lemon Velvet cake"/>
         </div>
         <div class="card-body">
@@ -424,8 +427,9 @@
         </div>
       </div>
 
-      <div class="price-card" data-tag="Premium">
+      <div class="price-card" data-tag="Premium" data-images="https://images.pexels.com/photos/34596959/pexels-photo-34596959.jpeg?auto=compress&cs=tinysrgb&w=800,https://images.unsplash.com/photo-1535141192574-5d4897c12636?w=800&q=80" data-full-desc="A three-tier centerpiece finished in smooth buttercream with delicate floral piping, built to order for your big day. Each tier can be a different flavour on request — message us with your vision and we'll bring it to life.">
         <div class="card-img-wrap">
+          <span class="card-view-hint">🔍 Quick view</span>
           <img src="https://images.pexels.com/photos/34596959/pexels-photo-34596959.jpeg?auto=compress&cs=tinysrgb&w=600" width="600" height="400" alt="wedding deluxe cake">
         </div>
         <div class="card-body">
@@ -444,8 +448,9 @@
         </div>
       </div>
 
-      <div class="price-card" data-tag="Classic">
+      <div class="price-card" data-tag="Classic" data-images="https://cdn.pixabay.com/photo/2020/07/06/14/45/cake-5377289_640.jpg,https://images.unsplash.com/photo-1586985289906-406988974504?w=800&q=80" data-full-desc="Classic red velvet sponge with a hint of cocoa, layered with rich cream cheese frosting. A timeless favourite that never goes out of style.">
         <div class="card-img-wrap">
+          <span class="card-view-hint">🔍 Quick view</span>
           <img src="https://cdn.pixabay.com/photo/2020/07/06/14/45/cake-5377289_640.jpg" width="640" height="480" alt="Red Velvet cake"/>
         </div>
         <div class="card-body">
@@ -464,9 +469,10 @@
         </div>
       </div>
 
-      <div class="price-card" data-tag="Caramel">
+      <div class="price-card" data-tag="Caramel" data-images="https://images.unsplash.com/photo-1547414368-ac947d00b91d?w=800&q=80,https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&q=80" data-full-desc="Moist caramel sponge layered with salted caramel filling and topped with golden praline crunch for texture. Sweet, salty, and satisfying in every bite.">
         <div class="card-img-wrap">
           <span class="badge new-badge">New</span>
+          <span class="card-view-hint">🔍 Quick view</span>
           <img src="https://images.unsplash.com/photo-1547414368-ac947d00b91d?w=400&q=80" width="400" height="300" alt="Caramel Crunch cake"/>
         </div>
         <div class="card-body">
@@ -945,6 +951,31 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- PRODUCT QUICK VIEW -->
+<div id="quickview-overlay">
+  <div id="quickview-modal" role="dialog" aria-modal="true" aria-labelledby="quickview-title">
+    <button id="quickview-close" aria-label="Close">&times;</button>
+
+    <div class="quickview-gallery">
+      <button id="quickview-prev" class="quickview-nav quickview-prev" aria-label="Previous photo">‹</button>
+      <img id="quickview-img" src="" alt="">
+      <button id="quickview-next" class="quickview-nav quickview-next" aria-label="Next photo">›</button>
+      <div class="quickview-dots" id="quickview-dots"></div>
+    </div>
+
+    <div class="quickview-info">
+      <span class="cake-tag" id="quickview-tag"></span>
+      <h2 id="quickview-title" class="quickview-name"></h2>
+      <p class="quickview-price" id="quickview-price"></p>
+      <p class="quickview-desc" id="quickview-desc"></p>
+      <div class="quickview-actions">
+        <button id="quickview-add-cart" class="btn-secondary">Add to Cart</button>
+        <button id="quickview-order-now" class="btn-primary">Order Now</button>
+      </div>
+    </div>
   </div>
 </div>
 
