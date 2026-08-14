@@ -164,7 +164,7 @@ img { display: block; max-width: 100%; }
 .nav-dropdown-menu {
   position: absolute;
   top: calc(100% + 12px);
-  left: 0;
+  right: 0;
   min-width: 190px;
   background: var(--card-bg);
   border-radius: var(--radius);
