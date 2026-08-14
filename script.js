@@ -205,6 +205,37 @@ navLinks.forEach(link => {
   });
 });
 
+// NAV — "More" DROPDOWN
+const navDropdown   = document.getElementById('nav-dropdown');
+const navMoreToggle = document.getElementById('nav-more-toggle');
+
+function closeNavDropdown() {
+  navDropdown.classList.remove('open');
+  navMoreToggle.setAttribute('aria-expanded', 'false');
+}
+
+navMoreToggle.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = navDropdown.classList.toggle('open');
+  navMoreToggle.setAttribute('aria-expanded', String(isOpen));
+});
+
+document.addEventListener('click', (e) => {
+  if (!navDropdown.classList.contains('open')) return;
+  if (navDropdown.contains(e.target)) return;
+  closeNavDropdown();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeNavDropdown();
+});
+
+// Selecting an item inside the dropdown closes the dropdown itself
+// (the existing navLinks handler above already closes the mobile hamburger menu).
+navDropdown.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', closeNavDropdown);
+});
+
 
 
 // CART + ORDER MODAL
@@ -1018,6 +1049,7 @@ navTrackLink.addEventListener('click', (e) => {
   e.preventDefault();
   hamburger.classList.remove('open');
   navBar.classList.remove('open');
+  closeNavDropdown();
   trackInput.value = '';
   openTrackModal();
 });
