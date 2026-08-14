@@ -321,10 +321,59 @@ function setMinDate() {
   document.getElementById('order-date').min = tomorrow.toISOString().split('T')[0];
 }
 
+// CAKE CUSTOMIZATION
+// Listed cake prices are the "Medium" size with "Buttercream" frosting.
+// Size scales the base price; frosting adds a flat fee on top.
+const CAKE_SIZE_MULTIPLIERS = { Small: 0.7, Medium: 1, Large: 1.5 };
+const CAKE_FROSTING_ADDONS  = { 'Buttercream': 0, 'Chocolate Ganache': 500, 'Fresh Cream': 300 };
+
+const sizeOptionsEl     = document.getElementById('size-options');
+const frostingOptionsEl = document.getElementById('frosting-options');
+
+let selectedSize     = 'Medium';
+let selectedFrosting = 'Buttercream';
+
+function computeCurrentPrice() {
+  if (!pendingItem) return 0;
+  const sizeMult    = CAKE_SIZE_MULTIPLIERS[selectedSize] ?? 1;
+  const frostingFee = CAKE_FROSTING_ADDONS[selectedFrosting] ?? 0;
+  return Math.round(pendingItem.price * sizeMult) + frostingFee;
+}
+
+function updateModalPrice() {
+  modalPrice.textContent = formatKES(computeCurrentPrice());
+}
+
+function setActivePill(row, key, value) {
+  row.querySelectorAll('.option-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset[key] === value);
+  });
+}
+
+sizeOptionsEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('.option-pill');
+  if (!btn) return;
+  selectedSize = btn.dataset.size;
+  setActivePill(sizeOptionsEl, 'size', selectedSize);
+  updateModalPrice();
+});
+
+frostingOptionsEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('.option-pill');
+  if (!btn) return;
+  selectedFrosting = btn.dataset.frosting;
+  setActivePill(frostingOptionsEl, 'frosting', selectedFrosting);
+  updateModalPrice();
+});
+
 function openModal(name, price) {
   pendingItem = { name, price };
   modalTitle.textContent  = name;
-  modalPrice.textContent  = formatKES(price);
+  selectedSize     = 'Medium';
+  selectedFrosting = 'Buttercream';
+  setActivePill(sizeOptionsEl, 'size', selectedSize);
+  setActivePill(frostingOptionsEl, 'frosting', selectedFrosting);
+  updateModalPrice();
   step1.classList.remove('hidden');
   step2.classList.add('hidden');
   clearErrors();
@@ -619,8 +668,14 @@ document.getElementById('modal-submit').addEventListener('click', () => {
   const notes     = document.getElementById('order-notes').value.trim();
   const dateStr   = date.toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  // Add to cart
-  const { name: itemName, price } = pendingItem;
+  // Add to cart — customized items get a distinct cart line from the base cake
+  const { name: baseCakeName } = pendingItem;
+  const price = computeCurrentPrice();
+  const isDefaultOptions = selectedSize === 'Medium' && selectedFrosting === 'Buttercream';
+  const variantSuffix = isDefaultOptions
+    ? ''
+    : ` (${selectedSize}${selectedFrosting !== 'Buttercream' ? ', ' + selectedFrosting : ''})`;
+  const itemName = `${baseCakeName}${variantSuffix}`;
   addToCart(itemName, price);
 
   // Create a trackable order record
@@ -629,6 +684,8 @@ document.getElementById('modal-submit').addEventListener('click', () => {
     id: orderId,
     cake: itemName,
     price,
+    size: selectedSize,
+    frosting: selectedFrosting,
     name,
     phone,
     address,
@@ -642,7 +699,9 @@ document.getElementById('modal-submit').addEventListener('click', () => {
   document.getElementById('confirm-order-id').textContent = orderId;
 
   const rows = [
-    ['Cake',     itemName],
+    ['Cake',     baseCakeName],
+    ['Size',     selectedSize],
+    ['Frosting', selectedFrosting],
     ['Price',    formatKES(price)],
     ['Name',     name],
     ['Phone',    phone],
@@ -734,6 +793,8 @@ function buildOrderWhatsAppMessage(order) {
   let msg = "Hi SweetBite! I just placed an order — please confirm:\n\n";
   msg += `Order ID: ${order.id}\n`;
   msg += `Cake: ${order.cake}\n`;
+  if (order.size)     msg += `Size: ${order.size}\n`;
+  if (order.frosting) msg += `Frosting: ${order.frosting}\n`;
   msg += `Price: ${formatKES(order.price)}\n`;
   msg += `Name: ${order.name}\n`;
   msg += `Phone: ${order.phone}\n`;
