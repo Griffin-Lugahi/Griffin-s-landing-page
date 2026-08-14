@@ -806,6 +806,22 @@
 
       <div class="modal-body">
         <div class="field-group">
+          <label>Size</label>
+          <div class="option-pill-row" id="size-options" role="group" aria-label="Choose cake size">
+            <button type="button" class="option-pill" data-size="Small">Small</button>
+            <button type="button" class="option-pill active" data-size="Medium">Medium</button>
+            <button type="button" class="option-pill" data-size="Large">Large</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Frosting</label>
+          <div class="option-pill-row" id="frosting-options" role="group" aria-label="Choose frosting">
+            <button type="button" class="option-pill active" data-frosting="Buttercream">Buttercream</button>
+            <button type="button" class="option-pill" data-frosting="Chocolate Ganache">Ganache <span class="option-pill-addon">+KSh 500</span></button>
+            <button type="button" class="option-pill" data-frosting="Fresh Cream">Fresh Cream <span class="option-pill-addon">+KSh 300</span></button>
+          </div>
+        </div>
+        <div class="field-group">
           <label for="order-name">Full name</label>
           <input type="text" id="order-name" name="name" placeholder="e.g. Amara Osei" autocomplete="name" />
           <span class="field-error" id="err-name"></span>
