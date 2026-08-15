@@ -260,6 +260,12 @@ const cartSubtotalEl   = document.getElementById('cart-subtotal');
 const cartDiscountRow  = document.getElementById('cart-discount-row');
 const cartDiscountLabel = document.getElementById('cart-discount-label');
 const cartDiscountEl   = document.getElementById('cart-discount');
+const cartDeliveryRow       = document.getElementById('cart-delivery-row');
+const cartDeliveryZoneLabel = document.getElementById('cart-delivery-zone-label');
+const cartDeliveryFeeEl     = document.getElementById('cart-delivery-fee');
+const deliveryZoneSelect    = document.getElementById('delivery-zone-select');
+const deliveryCheckBtn      = document.getElementById('delivery-check-btn');
+const deliveryCheckResultEl = document.getElementById('delivery-check-result');
 
 const overlay     = document.getElementById('modal-overlay');
 const step1       = document.getElementById('modal-step-1');
@@ -272,15 +278,32 @@ const cart = {};
 let pendingItem = null;
 let lastOrder = null; // most recently placed order, for the "Track This Order" shortcut
 let appliedCoupon = null; // { code, type: 'percent'|'flat', value, label }
+let appliedDeliveryZone = null; // { zone, fee } — set once the person checks their delivery area
+
+// DELIVERY ZONES
+// Flat delivery fees by Nairobi area, checked from the cart dropdown.
+const DELIVERY_ZONES = {
+  'Westlands': 0,
+  'Parklands': 200,
+  'CBD': 300,
+  'Kilimani': 250,
+  'Lavington': 250,
+  'South B / South C': 400,
+  'Karen': 500,
+  'Runda': 500,
+  'Kasarani': 600,
+  'Ruaka': 600,
+};
 
 // CART PERSISTENCE
-// Keeps the cart (and any applied coupon) across page refreshes/navigation
-// using localStorage, so an in-progress order doesn't just vanish.
+// Keeps the cart (and any applied coupon/delivery zone) across page
+// refreshes/navigation using localStorage, so an in-progress order
+// doesn't just vanish.
 const CART_STORAGE_KEY = 'sweetbite_cart_state';
 
 function saveCartState() {
   try {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ cart, appliedCoupon }));
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ cart, appliedCoupon, appliedDeliveryZone }));
   } catch {
     // Storage unavailable (private browsing, quota, etc.) — fail silently,
     // the cart just won't persist for this session.
@@ -295,6 +318,9 @@ function loadCartState() {
     }
     if (saved && saved.appliedCoupon) {
       appliedCoupon = saved.appliedCoupon;
+    }
+    if (saved && saved.appliedDeliveryZone) {
+      appliedDeliveryZone = saved.appliedDeliveryZone;
     }
   } catch {
     // Corrupted or missing data — start with an empty cart, no big deal.
@@ -608,7 +634,8 @@ function renderCart() {
 
   const subtotal = calcSubtotal();
   const discount  = calcDiscount(subtotal);
-  const total     = Math.max(0, subtotal - discount);
+  const deliveryFee = appliedDeliveryZone ? appliedDeliveryZone.fee : 0;
+  const total     = Math.max(0, subtotal - discount) + deliveryFee;
 
   cartSubtotalEl.textContent = formatKES(subtotal);
   cartTotalEl.textContent    = formatKES(total);
@@ -619,6 +646,14 @@ function renderCart() {
     cartDiscountEl.textContent = `-${formatKES(discount)}`;
   } else {
     cartDiscountRow.classList.add('hidden');
+  }
+
+  if (appliedDeliveryZone) {
+    cartDeliveryRow.classList.remove('hidden');
+    cartDeliveryZoneLabel.textContent = appliedDeliveryZone.zone;
+    cartDeliveryFeeEl.textContent = deliveryFee === 0 ? 'Free' : formatKES(deliveryFee);
+  } else {
+    cartDeliveryRow.classList.add('hidden');
   }
 }
 
@@ -752,6 +787,42 @@ couponInput.addEventListener('keydown', (e) => {
 });
 couponRemoveBtn.addEventListener('click', () => removeCoupon(true));
 
+// DELIVERY ZONE CHECK
+function checkDeliveryZone() {
+  const zone = deliveryZoneSelect.value;
+  deliveryCheckResultEl.classList.remove('covered', 'not-covered');
+
+  if (!zone) {
+    deliveryCheckResultEl.textContent = 'Please select your area first.';
+    deliveryCheckResultEl.classList.add('not-covered');
+    return;
+  }
+
+  if (zone === '__other' || !(zone in DELIVERY_ZONES)) {
+    appliedDeliveryZone = null;
+    deliveryCheckResultEl.textContent = "😔 We don't currently deliver there — message us on WhatsApp and we'll see what we can arrange.";
+    deliveryCheckResultEl.classList.add('not-covered');
+    renderCart();
+    saveCartState();
+    return;
+  }
+
+  const fee = DELIVERY_ZONES[zone];
+  appliedDeliveryZone = { zone, fee };
+  deliveryCheckResultEl.textContent = fee === 0
+    ? `✅ We deliver to ${zone} — delivery is free!`
+    : `✅ We deliver to ${zone} — KSh ${fee.toLocaleString('en-KE')} delivery fee.`;
+  deliveryCheckResultEl.classList.add('covered');
+  renderCart();
+  saveCartState();
+}
+
+deliveryCheckBtn.addEventListener('click', checkDeliveryZone);
+deliveryZoneSelect.addEventListener('change', () => {
+  deliveryCheckResultEl.textContent = '';
+  deliveryCheckResultEl.classList.remove('covered', 'not-covered');
+});
+
 cartCheckoutBtn.addEventListener('click', () => {
   if (Object.keys(cart).length === 0) return;
   const msg = buildWhatsAppMessage();
@@ -844,12 +915,19 @@ document.getElementById('modal-track-btn').addEventListener('click', () => {
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// Initial render — restore any saved cart/coupon before first paint
+// Initial render — restore any saved cart/coupon/delivery zone before first paint
 loadCartState();
 if (appliedCoupon) {
   couponForm.classList.add('hidden');
   couponApplied.classList.remove('hidden');
   couponAppliedText.textContent = `✅ ${appliedCoupon.code} applied — ${appliedCoupon.label}`;
+}
+if (appliedDeliveryZone) {
+  deliveryZoneSelect.value = appliedDeliveryZone.zone;
+  deliveryCheckResultEl.textContent = appliedDeliveryZone.fee === 0
+    ? `✅ We deliver to ${appliedDeliveryZone.zone} — delivery is free!`
+    : `✅ We deliver to ${appliedDeliveryZone.zone} — KSh ${appliedDeliveryZone.fee.toLocaleString('en-KE')} delivery fee.`;
+  deliveryCheckResultEl.classList.add('covered');
 }
 renderCart();
 updateCartCount();
@@ -875,11 +953,15 @@ function buildWhatsAppMessage() {
   });
 
   const discount = calcDiscount(subtotal);
-  const total = Math.max(0, subtotal - discount);
+  const deliveryFee = appliedDeliveryZone ? appliedDeliveryZone.fee : 0;
+  const total = Math.max(0, subtotal - discount) + deliveryFee;
 
   msg += `\nSubtotal: ${formatKES(subtotal)}`;
   if (appliedCoupon && discount > 0) {
     msg += `\nCoupon (${appliedCoupon.code}): -${formatKES(discount)}`;
+  }
+  if (appliedDeliveryZone) {
+    msg += `\nDelivery (${appliedDeliveryZone.zone}): ${deliveryFee === 0 ? 'Free' : formatKES(deliveryFee)}`;
   }
   msg += `\n*Total: ${formatKES(total)}*`;
   msg += "\n\nPlease confirm availability and delivery details. Thank you!";
