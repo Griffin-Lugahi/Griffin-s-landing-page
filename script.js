@@ -1321,3 +1321,120 @@ document.getElementById('track-another-btn').addEventListener('click', () => {
   trackInput.classList.remove('invalid');
   setTimeout(() => trackInput.focus(), 150);
 });
+
+
+// NEWSLETTER / DISCOUNT POPUP
+// Shows once per browser (localStorage-gated) offering the existing
+// WELCOME10 coupon in exchange for an email signup.
+const NEWSLETTER_SEEN_KEY = 'sweetbite_newsletter_seen';
+const NEWSLETTER_DELAY_MS = 6000;
+const NEWSLETTER_CODE     = 'WELCOME10';
+
+const newsletterOverlay     = document.getElementById('newsletter-overlay');
+const newsletterModal       = document.getElementById('newsletter-modal');
+const newsletterStepForm    = document.getElementById('newsletter-step-form');
+const newsletterStepSuccess = document.getElementById('newsletter-step-success');
+const newsletterForm        = document.getElementById('newsletter-form');
+const newsletterEmailInput  = document.getElementById('newsletter-email');
+const newsletterEmailError  = document.getElementById('err-newsletter-email');
+const newsletterCopyBtn     = document.getElementById('newsletter-copy-btn');
+
+function hasSeenNewsletterPopup() {
+  try {
+    return localStorage.getItem(NEWSLETTER_SEEN_KEY) === '1';
+  } catch {
+    return true; // if storage is unavailable, don't keep trying to show it
+  }
+}
+
+function markNewsletterPopupSeen() {
+  try {
+    localStorage.setItem(NEWSLETTER_SEEN_KEY, '1');
+  } catch {
+    // Storage unavailable — fine, it just may show again next visit.
+  }
+}
+
+function anyOtherOverlayOpen() {
+  return [overlay, trackOverlay, quickviewOverlay, lightbox].some(el => el && el.classList.contains('open'));
+}
+
+function openNewsletterPopup() {
+  newsletterStepForm.classList.remove('hidden');
+  newsletterStepSuccess.classList.add('hidden');
+  newsletterEmailInput.value = '';
+  newsletterEmailError.textContent = '';
+  newsletterEmailInput.classList.remove('invalid');
+  newsletterOverlay.classList.add('open');
+  setTimeout(() => {
+    newsletterEmailInput.focus();
+    pushFocusTrap(newsletterModal);
+  }, 250);
+}
+
+function closeNewsletterPopup() {
+  newsletterOverlay.classList.remove('open');
+  popFocusTrap();
+}
+
+setTimeout(() => {
+  if (hasSeenNewsletterPopup() || anyOtherOverlayOpen()) return;
+  openNewsletterPopup();
+}, NEWSLETTER_DELAY_MS);
+
+document.getElementById('newsletter-close').addEventListener('click', () => {
+  markNewsletterPopupSeen();
+  closeNewsletterPopup();
+});
+document.getElementById('newsletter-no-thanks').addEventListener('click', () => {
+  markNewsletterPopupSeen();
+  closeNewsletterPopup();
+});
+newsletterOverlay.addEventListener('click', e => {
+  if (e.target === newsletterOverlay) {
+    markNewsletterPopupSeen();
+    closeNewsletterPopup();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && newsletterOverlay.classList.contains('open')) {
+    markNewsletterPopupSeen();
+    closeNewsletterPopup();
+  }
+});
+
+newsletterForm.addEventListener('submit', e => {
+  e.preventDefault();
+  const email = newsletterEmailInput.value.trim();
+  newsletterEmailError.textContent = '';
+  newsletterEmailInput.classList.remove('invalid');
+
+  if (!email) {
+    newsletterEmailError.textContent = 'Please enter your email.';
+    newsletterEmailInput.classList.add('invalid');
+    return;
+  }
+  if (!isValidEmail(email)) {
+    newsletterEmailError.textContent = 'Enter a valid email address.';
+    newsletterEmailInput.classList.add('invalid');
+    return;
+  }
+
+  markNewsletterPopupSeen();
+  newsletterStepForm.classList.add('hidden');
+  newsletterStepSuccess.classList.remove('hidden');
+  showToast('🎉 You\'re subscribed!');
+});
+
+newsletterCopyBtn.addEventListener('click', () => {
+  const finish = () => showToast('📋 Code copied!');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(NEWSLETTER_CODE).then(finish).catch(finish);
+  } else {
+    finish();
+  }
+});
+
+document.getElementById('newsletter-done-btn').addEventListener('click', () => {
+  closeNewsletterPopup();
+});
