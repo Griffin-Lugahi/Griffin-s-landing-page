@@ -1022,6 +1022,39 @@
   </svg>
 </button>
 
+<!-- NEWSLETTER / DISCOUNT POPUP -->
+<div id="newsletter-overlay">
+  <div id="newsletter-modal" role="dialog" aria-modal="true" aria-labelledby="newsletter-title">
+    <button id="newsletter-close" aria-label="Close">&times;</button>
+
+    <div id="newsletter-step-form">
+      <div class="newsletter-icon">🎂</div>
+      <h2 id="newsletter-title" class="newsletter-heading">Get 10% off your first order</h2>
+      <p class="newsletter-sub">Join our list for sweet updates, new flavours, and exclusive offers.</p>
+      <form id="newsletter-form">
+        <div class="field-group">
+          <label for="newsletter-email" class="sr-only">Email address</label>
+          <input type="email" id="newsletter-email" name="email" placeholder="you@email.com" autocomplete="email" />
+          <span class="field-error" id="err-newsletter-email"></span>
+        </div>
+        <button type="submit" class="btn-primary">Get My Discount</button>
+      </form>
+      <button id="newsletter-no-thanks" class="newsletter-skip" type="button">No thanks</button>
+    </div>
+
+    <div id="newsletter-step-success" class="hidden">
+      <div class="confirm-icon">🎉</div>
+      <h2 class="confirm-title">You're in!</h2>
+      <p class="confirm-sub">Use this code at checkout for 10% off your first order.</p>
+      <div class="newsletter-code-row">
+        <span id="newsletter-code">WELCOME10</span>
+        <button id="newsletter-copy-btn" type="button">Copy</button>
+      </div>
+      <button id="newsletter-done-btn" class="btn-primary">Start Shopping</button>
+    </div>
+  </div>
+</div>
+
   <script src="script.js"></script>
 </body>
 </html>
