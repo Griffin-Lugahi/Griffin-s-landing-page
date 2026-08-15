@@ -127,12 +127,37 @@
             </div>
             <span class="field-error" id="err-coupon"></span>
 
+            <div class="delivery-check">
+              <label for="delivery-zone-select" class="delivery-check-label">Check delivery to your area</label>
+              <div class="delivery-check-row">
+                <select id="delivery-zone-select">
+                  <option value="">Select your area…</option>
+                  <option value="Westlands">Westlands</option>
+                  <option value="Parklands">Parklands</option>
+                  <option value="CBD">CBD</option>
+                  <option value="Kilimani">Kilimani</option>
+                  <option value="Lavington">Lavington</option>
+                  <option value="South B / South C">South B / South C</option>
+                  <option value="Karen">Karen</option>
+                  <option value="Runda">Runda</option>
+                  <option value="Kasarani">Kasarani</option>
+                  <option value="Ruaka">Ruaka</option>
+                  <option value="__other">Outside Nairobi / Other</option>
+                </select>
+                <button id="delivery-check-btn" type="button">Check</button>
+              </div>
+              <p class="delivery-check-result" id="delivery-check-result"></p>
+            </div>
+
             <div class="cart-totals">
               <div class="cart-subtotal-row">
                 <span>Subtotal</span><span id="cart-subtotal">KSh 0</span>
               </div>
               <div class="cart-discount-row hidden" id="cart-discount-row">
                 <span id="cart-discount-label">Discount</span><span id="cart-discount">-KSh 0</span>
+              </div>
+              <div class="cart-delivery-row hidden" id="cart-delivery-row">
+                <span>Delivery (<span id="cart-delivery-zone-label"></span>)</span><span id="cart-delivery-fee">KSh 0</span>
               </div>
               <div class="cart-total-row"><span>Total</span><span id="cart-total">KSh 0</span></div>
             </div>
