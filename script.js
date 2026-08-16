@@ -113,6 +113,7 @@ if (localStorage.getItem('theme') === 'dark') {
   document.body.classList.add('dark');
   iconMoon.style.display = 'none';
   iconSun.style.display  = 'block';
+  themeToggle.setAttribute('aria-pressed', 'true');
 }
 
 themeToggle.addEventListener('click', () => {
@@ -120,6 +121,7 @@ themeToggle.addEventListener('click', () => {
 
   iconMoon.style.display = isDark ? 'none'  : 'block';
   iconSun.style.display  = isDark ? 'block' : 'none';
+  themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
 
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 });
@@ -148,8 +150,12 @@ cakeFilterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     const filter = btn.dataset.filter;
 
-    cakeFilterBtns.forEach(b => b.classList.remove('active'));
+    cakeFilterBtns.forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
 
     let visibleCount = 0;
     priceCards.forEach(card => {
@@ -193,15 +199,19 @@ function highlightNav() {
 const hamburger = document.getElementById('hamburger');
 const navBar    = document.getElementById('nav-bar');
 
+function setHamburgerOpen(isOpen) {
+  hamburger.classList.toggle('open', isOpen);
+  navBar.classList.toggle('open', isOpen);
+  hamburger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
 hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('open');
-  navBar.classList.toggle('open');
+  setHamburgerOpen(!hamburger.classList.contains('open'));
 });
 
 navLinks.forEach(link => {
   link.addEventListener('click', () => {
-    hamburger.classList.remove('open');
-    navBar.classList.remove('open');
+    setHamburgerOpen(false);
   });
 });
 
@@ -372,7 +382,9 @@ function updateModalPrice() {
 
 function setActivePill(row, key, value) {
   row.querySelectorAll('.option-pill').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset[key] === value);
+    const isActive = btn.dataset[key] === value;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
 }
 
@@ -491,8 +503,11 @@ let quickviewItem   = null; // { name, price }
 
 function renderQuickviewImage() {
   quickviewImg.src = quickviewImages[quickviewIndex];
+  const cakeName = quickviewItem ? quickviewItem.name : 'cake';
+  quickviewImg.alt = `${cakeName} — photo ${quickviewIndex + 1} of ${quickviewImages.length}`;
   quickviewDots.querySelectorAll('.quickview-dot').forEach((dot, i) => {
     dot.classList.toggle('active', i === quickviewIndex);
+    dot.setAttribute('aria-pressed', i === quickviewIndex ? 'true' : 'false');
   });
 }
 
@@ -520,7 +535,7 @@ function openQuickview(card) {
   quickviewDesc.textContent  = fullDesc;
 
   quickviewDots.innerHTML = quickviewImages
-    .map((_, i) => `<button type="button" class="quickview-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Photo ${i + 1}"></button>`)
+    .map((_, i) => `<button type="button" class="quickview-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Photo ${i + 1}" aria-pressed="${i === 0 ? 'true' : 'false'}"></button>`)
     .join('');
   const multiplePhotos = quickviewImages.length > 1;
   quickviewPrev.style.display = multiplePhotos ? 'flex' : 'none';
@@ -1293,8 +1308,7 @@ function lookupOrder(idStr) {
 // --- Tracker modal events ---
 navTrackLink.addEventListener('click', (e) => {
   e.preventDefault();
-  hamburger.classList.remove('open');
-  navBar.classList.remove('open');
+  setHamburgerOpen(false);
   closeNavDropdown();
   trackInput.value = '';
   openTrackModal();
@@ -1365,6 +1379,7 @@ function openNewsletterPopup() {
   newsletterEmailInput.value = '';
   newsletterEmailError.textContent = '';
   newsletterEmailInput.classList.remove('invalid');
+  newsletterModal.setAttribute('aria-labelledby', 'newsletter-title');
   newsletterOverlay.classList.add('open');
   setTimeout(() => {
     newsletterEmailInput.focus();
@@ -1423,6 +1438,7 @@ newsletterForm.addEventListener('submit', e => {
   markNewsletterPopupSeen();
   newsletterStepForm.classList.add('hidden');
   newsletterStepSuccess.classList.remove('hidden');
+  newsletterModal.setAttribute('aria-labelledby', 'newsletter-success-title');
   showToast('🎉 You\'re subscribed!');
 });
 
