@@ -1941,6 +1941,15 @@ body.dark .cake-filter-btn {
   }
 }
 
+@media (max-width: 380px) {
+  .quickview-info {
+    padding: 24px 20px;
+  }
+  .quickview-actions {
+    flex-direction: column;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1987,6 +1996,12 @@ body.dark .cake-filter-btn {
 }
 #newsletter-overlay.open #newsletter-modal {
   transform: translateY(0) scale(1);
+}
+
+@media (max-width: 380px) {
+  #newsletter-modal {
+    padding: 30px 20px 22px;
+  }
 }
 
 #newsletter-close {
