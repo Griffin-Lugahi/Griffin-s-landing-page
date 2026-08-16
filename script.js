@@ -362,6 +362,7 @@ function setMinDate() {
 // Size scales the base price; frosting adds a flat fee on top.
 const CAKE_SIZE_MULTIPLIERS = { Small: 0.7, Medium: 1, Large: 1.5 };
 const CAKE_FROSTING_ADDONS  = { 'Buttercream': 0, 'Chocolate Ganache': 500, 'Fresh Cream': 300 };
+const CAKE_SIZE_SERVINGS    = { Small: 'serves 6–8', Medium: 'serves 10–12', Large: 'serves 15–20' };
 
 const sizeOptionsEl     = document.getElementById('size-options');
 const frostingOptionsEl = document.getElementById('frosting-options');
@@ -889,7 +890,7 @@ document.getElementById('modal-submit').addEventListener('click', () => {
 
   const rows = [
     ['Cake',     baseCakeName],
-    ['Size',     selectedSize],
+    ['Size',     `${selectedSize} (${CAKE_SIZE_SERVINGS[selectedSize]})`],
     ['Frosting', selectedFrosting],
     ['Price',    formatKES(price)],
     ['Name',     name],
@@ -993,7 +994,7 @@ function buildOrderWhatsAppMessage(order) {
   let msg = "Hi SweetBite! I just placed an order — please confirm:\n\n";
   msg += `Order ID: ${order.id}\n`;
   msg += `Cake: ${order.cake}\n`;
-  if (order.size)     msg += `Size: ${order.size}\n`;
+  if (order.size)     msg += `Size: ${order.size} (${CAKE_SIZE_SERVINGS[order.size] || ''})\n`;
   if (order.frosting) msg += `Frosting: ${order.frosting}\n`;
   msg += `Price: ${formatKES(order.price)}\n`;
   msg += `Name: ${order.name}\n`;
