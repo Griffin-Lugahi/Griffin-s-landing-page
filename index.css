@@ -3042,3 +3042,77 @@ body.dark .confirm-wa-note {
     right: -8px;
   }
 }
+
+/* 404 ERROR PAGE */
+#error-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  background: var(--bg);
+  text-align: center;
+}
+.error-content {
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.error-doodle {
+  font-size: 3rem;
+  margin-bottom: 4px;
+}
+.error-code {
+  font-size: 5.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 3px var(--primary);
+  letter-spacing: 0.02em;
+}
+.error-heading {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--heading);
+  line-height: 1.35;
+}
+.error-sub {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 6px;
+}
+.error-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.error-contact-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+.error-contact-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .error-code {
+    font-size: 4rem;
+  }
+  .error-heading {
+    font-size: 1.15rem;
+  }
+  .error-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  .error-actions .hero-btn {
+    justify-content: center;
+  }
+}
