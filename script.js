@@ -493,6 +493,11 @@ const quickviewTag      = document.getElementById('quickview-tag');
 const quickviewTitle    = document.getElementById('quickview-title');
 const quickviewPrice    = document.getElementById('quickview-price');
 const quickviewDesc     = document.getElementById('quickview-desc');
+const quickviewReview     = document.getElementById('quickview-review');
+const quickviewReviewText = document.getElementById('quickview-review-text');
+const quickviewReviewName = document.getElementById('quickview-review-name');
+const quickviewReviewRole = document.getElementById('quickview-review-role');
+const quickviewReviewAvatar = document.getElementById('quickview-review-avatar');
 const quickviewAddCart  = document.getElementById('quickview-add-cart');
 const quickviewOrderNow = document.getElementById('quickview-order-now');
 const quickviewPrev     = document.getElementById('quickview-prev');
@@ -517,6 +522,16 @@ function showQuickviewImage(delta) {
   renderQuickviewImage();
 }
 
+function getInitials(fullName) {
+  return fullName
+    .split(/\s+/)
+    .filter(w => /^[A-Za-z]/.test(w))
+    .map(w => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
 function openQuickview(card) {
   const name     = card.querySelector('h3').textContent.trim();
   const price    = parseInt(card.querySelector('.order-btn').dataset.price);
@@ -534,6 +549,18 @@ function openQuickview(card) {
   quickviewTitle.textContent = name;
   quickviewPrice.textContent = formatKES(price);
   quickviewDesc.textContent  = fullDesc;
+
+  const reviewText = card.dataset.reviewText;
+  if (reviewText) {
+    quickviewReview.classList.remove('hidden');
+    quickviewReviewText.textContent = `"${reviewText}"`;
+    quickviewReviewName.textContent = card.dataset.reviewAuthor || '';
+    quickviewReviewRole.textContent = card.dataset.reviewRole || '';
+    quickviewReviewAvatar.textContent = getInitials(card.dataset.reviewAuthor || '');
+    quickviewReviewAvatar.style.background = card.dataset.reviewColor || 'var(--primary)';
+  } else {
+    quickviewReview.classList.add('hidden');
+  }
 
   quickviewDots.innerHTML = quickviewImages
     .map((_, i) => `<button type="button" class="quickview-dot${i === 0 ? ' active' : ''}" data-index="${i}" aria-label="Photo ${i + 1}" aria-pressed="${i === 0 ? 'true' : 'false'}"></button>`)
