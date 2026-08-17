@@ -1917,6 +1917,55 @@ body.dark .cake-filter-btn {
   line-height: 1.7;
   flex: 1;
 }
+
+.quickview-review {
+  border-top: 1px solid #f0e0d0;
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+body.dark .quickview-review {
+  border-top-color: #3a2010;
+}
+.quickview-review-stars {
+  color: #f5a623;
+  font-size: 0.85rem;
+  letter-spacing: 1.5px;
+}
+.quickview-review-text {
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.6;
+  font-style: italic;
+}
+.quickview-review-author {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quickview-review-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.68rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+.quickview-review-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--heading);
+}
+.quickview-review-role {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
 .quickview-actions {
   display: flex;
   gap: 10px;
