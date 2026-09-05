@@ -50,6 +50,7 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 img { display: block; max-width: 100%; }
@@ -225,6 +226,7 @@ img { display: block; max-width: 100%; }
   align-items: center;
   gap: 7px;
   transition: var(--transition);
+  white-space: nowrap;
 }
 
 #cart-btn:hover {
@@ -699,6 +701,7 @@ body.dark .cart-total-row {
   border: none;
   cursor: pointer;
   padding: 4px;
+  flex-shrink: 0;
 }
 
 #hamburger span {
@@ -2351,15 +2354,6 @@ body.dark .quickview-review {
   background: var(--primary);
 }
 
-.tracker-message {
-  text-align: center;
-  font-size: 0.86rem;
-  color: var(--heading);
-  font-weight: 600;
-  margin-top: 18px;
-  padding: 0 12px;
-}
-
 body.dark .tracker-dot {
   border-color: #4a2e10;
 }
@@ -3000,6 +2994,17 @@ body.dark .confirm-wa-note {
     margin: 0 auto;
   }
 
+  /* The two-tone split background is designed for the side-by-side desktop
+     layout. Once .hero-grid stacks to a single column, stacked text now
+     overlaps both panels, so dark heading text becomes unreadable against
+     the dark left panel. Collapse to one solid panel instead. */
+  .hero-split-left {
+    width: 0;
+  }
+  .hero-split-right {
+    width: 100%;
+  }
+
   #promo-banner {
     padding: 12px 40px;
     font-size: 0.82rem;
@@ -3030,6 +3035,32 @@ body.dark .confirm-wa-note {
 }
 
 @media (max-width: 480px) {
+  /* Logo text + full-width cart button + theme toggle + hamburger no
+     longer fit in one row on narrow phones, which pushes the hamburger
+     past the edge of the viewport. Tighten spacing so everything stays
+     on-screen instead of silently overflowing. */
+  #header {
+    padding: 12px 14px;
+  }
+  .logo {
+    gap: 6px;
+  }
+  .logo-text {
+    font-size: 1.05rem;
+  }
+  .header-actions {
+    gap: 6px;
+  }
+  #cart-btn {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+    gap: 5px;
+  }
+  #theme-toggle {
+    width: 32px;
+    height: 32px;
+  }
+
   .hero-content h1 { font-size: 1.9rem; }
   .section-header h2 { font-size: 1.6rem; }
   .feature-container { flex-direction: column; align-items: center; }
