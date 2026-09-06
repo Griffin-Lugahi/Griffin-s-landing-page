@@ -1,0 +1,138 @@
+# SweetBite API
+
+A real backend for SweetBite Cakes, starting with user accounts. Built with
+Node.js, Express, and Postgres. Everything else (menu, orders, payments)
+plugs into this same structure later — see "Adding more features" below.
+
+## 1. Get a Postgres database
+
+Any of these work — pick one, then copy its connection string:
+
+- **Render** → New → PostgreSQL → copy the "External Database URL"
+- **Railway** → New Project → Provision PostgreSQL → copy the connection URL
+- **Supabase** → New Project → Settings → Database → Connection string
+
+Or run Postgres locally with Docker:
+
+```bash
+docker run --name sweetbite-db -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=sweetbite -p 5432:5432 -d postgres
+```
+
+## 2. Configure
+
+```bash
+cp .env.example .env
+```
+
+Fill in `DATABASE_URL` with the connection string from step 1, and generate
+a real `JWT_SECRET`:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+If you're on Render/Railway/Supabase in production, set `DATABASE_SSL=true`.
+
+## 3. Install and migrate
+
+```bash
+npm install
+npm run db:migrate
+```
+
+`db:migrate` just runs `db/schema.sql` against your database with `psql`.
+There's no migration framework here — for a project this size, running the
+SQL file directly is simpler than adding one. If you outgrow that, look at
+`node-pg-migrate` or Prisma Migrate later.
+
+## 4. Run it
+
+```bash
+npm run dev     # auto-restarts on file changes (nodemon)
+npm start       # plain node, for production
+```
+
+Server boots on `http://localhost:4000` by default.
+
+## API reference
+
+All request/response bodies are JSON. Protected routes need:
+`Authorization: Bearer <token>`
+
+### `POST /api/auth/register`
+```json
+{ "name": "Amara Osei", "email": "amara@email.com", "phone": "0712345678", "password": "at-least-8-chars" }
+```
+→ `201` `{ "token": "...", "user": { "id": 1, "name": "...", "email": "...", "phone": "...", "createdAt": "..." } }`
+
+### `POST /api/auth/login`
+```json
+{ "email": "amara@email.com", "password": "at-least-8-chars" }
+```
+→ `200` `{ "token": "...", "user": { ... } }`
+
+### `GET /api/auth/me`
+→ `200` `{ "user": { ... } }`
+
+### `PATCH /api/auth/me`
+```json
+{ "name": "New Name", "phone": "0700000000" }
+```
+→ `200` `{ "user": { ... } }`
+
+### `POST /api/auth/change-password`
+```json
+{ "currentPassword": "old-password", "newPassword": "new-password-8plus" }
+```
+→ `200` `{ "message": "Password updated." }`
+
+### `GET /api/health`
+→ `200` `{ "status": "ok" }` — use this for uptime checks / load balancer health checks.
+
+## Try it with curl
+
+```bash
+# Register
+curl -X POST http://localhost:4000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Amara Osei","email":"amara@email.com","password":"supersecret123"}'
+
+# Login (grab the token from the response)
+curl -X POST http://localhost:4000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"amara@email.com","password":"supersecret123"}'
+
+# Fetch the logged-in user
+curl http://localhost:4000/api/auth/me \
+  -H "Authorization: Bearer <token from login>"
+```
+
+## Security notes
+
+- Passwords are hashed with bcrypt (10 salt rounds), never stored or returned in plain text.
+- JWTs are stateless and expire after `JWT_EXPIRES_IN` (default 7 days). There's no server-side revocation list — if you need instant logout/ban capability later, that means either short-lived tokens + refresh tokens, or a token blocklist table.
+- Login and register are rate-limited (20 requests / 15 min / IP) to slow down brute-force guessing.
+- `helmet` sets sane security headers; `cors` restricts browser access to the origins listed in `CORS_ORIGIN`.
+- Login returns the same error for "no such user" and "wrong password" so the API can't be used to enumerate registered emails.
+
+## Adding more features
+
+Follow the same pattern for each new resource:
+
+1. Add a table to `db/schema.sql` (and re-run `npm run db:migrate`, or write a new migration file once you have more than one).
+2. `src/controllers/xController.js` — the actual logic.
+3. `src/routes/xRoutes.js` — validation + wiring to the controller.
+4. Register it in `src/routes/index.js`: `router.use('/x', require('./xRoutes'))`.
+
+Sensible next resources for this project, in order:
+- **`cakes`** — move the hardcoded cards out of your HTML into a real `cakes` table, with a public `GET /api/cakes` and an admin-only `POST/PATCH/DELETE`.
+- **`orders`** — replace the localStorage-based cart/order/tracking system in `script.js` with real rows tied to a `user_id`, so orders persist and survive a page refresh or device switch.
+- **payments** — M-Pesa (Daraja API) or Stripe, triggered once an order is created.
+- **admin role** — add a `role` column to `users` and an `requireAdmin` middleware once you have something worth protecting (menu editing, order status changes).
+
+## Deploying
+
+Render and Railway both auto-detect this as a Node app: set the build
+command to `npm install` and the start command to `npm start`, then add
+your `.env` values as environment variables in their dashboard (never
+commit `.env` — it's already in `.gitignore`).
