@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
 
--- Keeps updated_at current on every row update, so you don't have to
--- remember to set it manually in every query that touches a user.
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -26,5 +24,29 @@ $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS trg_users_updated_at ON users;
 CREATE TRIGGER trg_users_updated_at
   BEFORE UPDATE ON users
+  FOR EACH ROW
+  EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE IF NOT EXISTS cakes (
+  id             SERIAL PRIMARY KEY,
+  name           VARCHAR(120) NOT NULL UNIQUE,
+  short_desc     VARCHAR(240) NOT NULL,
+  full_desc      TEXT NOT NULL,
+  price          INTEGER NOT NULL CHECK (price >= 0),
+  tag            VARCHAR(40) NOT NULL,
+  badge          VARCHAR(20),
+  image_url      TEXT NOT NULL,
+  gallery_urls   TEXT[] NOT NULL DEFAULT '{}',
+  is_available   BOOLEAN NOT NULL DEFAULT true,
+  created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_cakes_tag ON cakes (tag);
+CREATE INDEX IF NOT EXISTS idx_cakes_available ON cakes (is_available);
+
+DROP TRIGGER IF EXISTS trg_cakes_updated_at ON cakes;
+CREATE TRIGGER trg_cakes_updated_at
+  BEFORE UPDATE ON cakes
   FOR EACH ROW
   EXECUTE FUNCTION set_updated_at();
