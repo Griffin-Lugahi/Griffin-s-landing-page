@@ -11,11 +11,6 @@ function showToast(message, type = 'success') {
 
 
 // FOCUS TRAP (for modals / dropdowns)
-// Keeps keyboard Tab/Shift+Tab cycling inside an open overlay instead of
-// leaking into page content hidden behind it, and restores focus to
-// whatever triggered the overlay once it closes. Stack-based so opening
-// one overlay from inside another (e.g. order modal -> track modal)
-// unwinds correctly.
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea, input:not([disabled]), select, [tabindex]:not([tabindex="-1"])';
 const focusTrapStack = [];
 
@@ -90,7 +85,6 @@ const themeToggle = document.getElementById('theme-toggle');
 const iconMoon    = document.getElementById('icon-moon');
 const iconSun     = document.getElementById('icon-sun');
 
-// Restore saved preference
 if (localStorage.getItem('theme') === 'dark') {
   document.body.classList.add('dark');
   iconMoon.style.display = 'none';
@@ -100,16 +94,14 @@ if (localStorage.getItem('theme') === 'dark') {
 
 themeToggle.addEventListener('click', () => {
   const isDark = document.body.classList.toggle('dark');
-
   iconMoon.style.display = isDark ? 'none'  : 'block';
   iconSun.style.display  = isDark ? 'block' : 'none';
   themeToggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
 });
 
 // SCROLL REVEAL 
-const revealEls = document.querySelectorAll('.feature, .price-card, .testi-card, .about-block, .stat-card, .gallery-item, .faq-item');
+const revealEls = document.querySelectorAll('.feature, .testi-card, .about-block, .stat-card, .gallery-item, .faq-item');
 
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry, i) => {
@@ -125,12 +117,26 @@ revealEls.forEach(el => revealObserver.observe(el));
 
 // CAKE FILTER BAR
 const cakeFilterBtns  = document.querySelectorAll('.cake-filter-btn');
-const priceCards      = document.querySelectorAll('.price-card');
 const cakeFilterEmpty = document.getElementById('cake-filter-empty');
+let currentCakeFilter = 'All';
+
+function applyCakeFilter() {
+  const priceCards = document.querySelectorAll('.price-card');
+  let visibleCount = 0;
+  priceCards.forEach(card => {
+    const matches = currentCakeFilter === 'All' || card.dataset.tag === currentCakeFilter;
+    card.classList.toggle('filter-hidden', !matches);
+    if (matches) {
+      card.classList.add('visible');
+      visibleCount++;
+    }
+  });
+  cakeFilterEmpty.classList.toggle('hidden', visibleCount > 0);
+}
 
 cakeFilterBtns.forEach(btn => {
   btn.addEventListener('click', () => {
-    const filter = btn.dataset.filter;
+    currentCakeFilter = btn.dataset.filter;
 
     cakeFilterBtns.forEach(b => {
       b.classList.remove('active');
@@ -139,19 +145,7 @@ cakeFilterBtns.forEach(btn => {
     btn.classList.add('active');
     btn.setAttribute('aria-pressed', 'true');
 
-    let visibleCount = 0;
-    priceCards.forEach(card => {
-      const matches = filter === 'All' || card.dataset.tag === filter;
-      card.classList.toggle('filter-hidden', !matches);
-      // Cards revealed after being filtered back in should still animate in,
-      // not stay invisible if the scroll-reveal observer already fired once.
-      if (matches) {
-        card.classList.add('visible');
-        visibleCount++;
-      }
-    });
-
-    cakeFilterEmpty.classList.toggle('hidden', visibleCount > 0);
+    applyCakeFilter();
   });
 });
 
@@ -222,8 +216,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeNavDropdown();
 });
 
-// Selecting an item inside the dropdown closes the dropdown itself
-// (the existing navLinks handler above already closes the mobile hamburger menu).
 navDropdown.querySelectorAll('.nav-link').forEach(link => {
   link.addEventListener('click', closeNavDropdown);
 });
@@ -268,12 +260,10 @@ const modalBadge  = document.getElementById('modal-badge');
 
 const cart = {};
 let pendingItem = null;
-let lastOrder = null; // most recently placed order, for the "Track This Order" shortcut
-let appliedCoupon = null; // { code, type: 'percent'|'flat', value, label }
-let appliedDeliveryZone = null; // { zone, fee } — set once the person checks their delivery area
+let lastOrder = null;
+let appliedCoupon = null;
+let appliedDeliveryZone = null;
 
-// DELIVERY ZONES
-// Flat delivery fees by Nairobi area, checked from the cart dropdown.
 const DELIVERY_ZONES = {
   'Westlands': 0,
   'Parklands': 200,
@@ -287,18 +277,12 @@ const DELIVERY_ZONES = {
   'Ruaka': 600,
 };
 
-// CART PERSISTENCE
-// Keeps the cart (and any applied coupon/delivery zone) across page
-// refreshes/navigation using localStorage, so an in-progress order
-// doesn't just vanish.
 const CART_STORAGE_KEY = 'sweetbite_cart_state';
 
 function saveCartState() {
   try {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ cart, appliedCoupon, appliedDeliveryZone }));
   } catch {
-    // Storage unavailable (private browsing, quota, etc.) — fail silently,
-    // the cart just won't persist for this session.
   }
 }
 
@@ -315,33 +299,25 @@ function loadCartState() {
       appliedDeliveryZone = saved.appliedDeliveryZone;
     }
   } catch {
-    // Corrupted or missing data — start with an empty cart, no big deal.
   }
 }
 
-// CURRENCY FORMATTING
-// All prices on this site are in Kenyan Shillings (KES).
 function formatKES(amount) {
   return `KSh ${Math.round(amount).toLocaleString('en-KE')}`;
 }
 
-// Available coupon codes
 const COUPONS = {
   SWEET15: { type: 'percent', value: 15, label: '15% off' },
   WELCOME10: { type: 'percent', value: 10, label: '10% off' },
   SAVE5: { type: 'flat', value: 500, label: 'KSh 500 off' },
 };
 
-// Minimum delivery date = tomorrow
 function setMinDate() {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   document.getElementById('order-date').min = tomorrow.toISOString().split('T')[0];
 }
 
-// CAKE CUSTOMIZATION
-// Listed cake prices are the "Medium" size with "Buttercream" frosting.
-// Size scales the base price; frosting adds a flat fee on top.
 const CAKE_SIZE_MULTIPLIERS = { Small: 0.7, Medium: 1, Large: 1.5 };
 const CAKE_FROSTING_ADDONS  = { 'Buttercream': 0, 'Chocolate Ganache': 500, 'Fresh Cream': 300 };
 const CAKE_SIZE_SERVINGS    = { Small: 'serves 6–8', Medium: 'serves 10–12', Large: 'serves 15–20' };
@@ -445,28 +421,7 @@ function validateForm() {
   return valid;
 }
 
-// Order Now buttons → open modal
-document.querySelectorAll('.order-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    openModal(btn.dataset.name, parseInt(btn.dataset.price));
-  });
-});
-
-// Quick-add buttons → skip the modal, add straight to cart
-document.querySelectorAll('.quick-add-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const name  = btn.dataset.name;
-    const price = parseInt(btn.dataset.price);
-    addToCart(name, price);
-    showToast(`🛒 Added ${name} to cart`);
-  });
-});
-
 // PRODUCT QUICK VIEW
-// Clicking anywhere on a cake card (outside its buttons) opens a larger
-// preview with more photos and the full description.
 const quickviewOverlay  = document.getElementById('quickview-overlay');
 const quickviewModal    = document.getElementById('quickview-modal');
 const quickviewImg      = document.getElementById('quickview-img');
@@ -487,7 +442,7 @@ const quickviewNext     = document.getElementById('quickview-next');
 
 let quickviewImages = [];
 let quickviewIndex  = 0;
-let quickviewItem   = null; // { name, price }
+let quickviewItem   = null;
 
 function renderQuickviewImage() {
   quickviewImg.src = quickviewImages[quickviewIndex];
@@ -561,13 +516,6 @@ function closeQuickview() {
   quickviewOverlay.classList.remove('open');
   popFocusTrap();
 }
-
-document.querySelectorAll('.price-card').forEach(card => {
-  card.addEventListener('click', (e) => {
-    if (e.target.closest('button')) return;
-    openQuickview(card);
-  });
-});
 
 document.getElementById('quickview-close').addEventListener('click', closeQuickview);
 quickviewOverlay.addEventListener('click', e => { if (e.target === quickviewOverlay) closeQuickview(); });
@@ -693,7 +641,6 @@ function addToCart(name, price, qty = 1) {
   saveCartState();
 }
 
-// Open / close the dropdown
 function openCartDropdown() {
   cartDropdown.classList.add('open');
   cartBtn.setAttribute('aria-expanded', 'true');
@@ -724,7 +671,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeCartDropdown();
 });
 
-// Quantity +/- and remove, via delegation
 cartItemsList.addEventListener('click', (e) => {
   const itemEl = e.target.closest('.cart-item');
   if (!itemEl) return;
@@ -812,7 +758,6 @@ couponInput.addEventListener('keydown', (e) => {
 });
 couponRemoveBtn.addEventListener('click', () => removeCoupon(true));
 
-// DELIVERY ZONE CHECK
 function checkDeliveryZone() {
   const zone = deliveryZoneSelect.value;
   deliveryCheckResultEl.classList.remove('covered', 'not-covered');
@@ -855,7 +800,6 @@ cartCheckoutBtn.addEventListener('click', () => {
   window.open(url, '_blank');
 });
 
-// Submit order form
 document.getElementById('modal-submit').addEventListener('click', () => {
   if (!validateForm()) return;
 
@@ -867,7 +811,6 @@ document.getElementById('modal-submit').addEventListener('click', () => {
   const notes     = document.getElementById('order-notes').value.trim();
   const dateStr   = date.toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  // Add to cart — customized items get a distinct cart line from the base cake
   const { name: baseCakeName } = pendingItem;
   const price = computeCurrentPrice();
   const isDefaultOptions = selectedSize === 'Medium' && selectedFrosting === 'Buttercream';
@@ -877,7 +820,6 @@ document.getElementById('modal-submit').addEventListener('click', () => {
   const itemName = `${baseCakeName}${variantSuffix}`;
   addToCart(itemName, price);
 
-  // Create a trackable order record
   const orderId = generateOrderId();
   lastOrder = {
     id: orderId,
@@ -894,7 +836,6 @@ document.getElementById('modal-submit').addEventListener('click', () => {
   };
   addOrderRecord(lastOrder);
 
-  // Build confirmation
   document.getElementById('confirm-order-id').textContent = orderId;
 
   const rows = [
@@ -913,14 +854,12 @@ document.getElementById('modal-submit').addEventListener('click', () => {
     .map(([k, v]) => `<div class="confirm-row"><span>${k}</span><span>${v}</span></div>`)
     .join('');
 
-  // Auto-open a pre-filled WhatsApp confirmation message for this order
   sendOrderWhatsAppConfirmation(lastOrder);
 
   step1.classList.add('hidden');
   step2.classList.remove('hidden');
 });
 
-// Close triggers
 document.getElementById('modal-close').addEventListener('click', closeModal);
 document.getElementById('modal-done').addEventListener('click', () => {
   closeModal();
@@ -940,7 +879,6 @@ document.getElementById('modal-track-btn').addEventListener('click', () => {
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// Initial render — restore any saved cart/coupon/delivery zone before first paint
 loadCartState();
 if (appliedCoupon) {
   couponForm.classList.add('hidden');
@@ -993,8 +931,6 @@ function buildWhatsAppMessage() {
   return msg;
 }
 
-// Builds the order-confirmation WhatsApp message sent right after checkout
-// (separate from the cart checkout message above, which can bundle multiple cakes).
 function buildOrderWhatsAppMessage(order) {
   const dateStr = order.date
     ? new Date(order.date + 'T00:00:00').toLocaleDateString('en-KE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
@@ -1015,9 +951,6 @@ function buildOrderWhatsAppMessage(order) {
   return msg;
 }
 
-// Opens a pre-filled WhatsApp chat with the shop so the order acts as
-// an automatic confirmation message — there's no backend here, so this
-// is the closest equivalent to an email/SMS receipt this site can send.
 function sendOrderWhatsAppConfirmation(order) {
   if (!order) return;
   const msg = buildOrderWhatsAppMessage(order);
@@ -1103,7 +1036,6 @@ document.querySelectorAll('.faq-item').forEach(item => {
   question.addEventListener('click', () => {
     const isOpen = item.classList.contains('open');
 
-    // Close any other open item
     document.querySelectorAll('.faq-item.open').forEach(openItem => {
       if (openItem !== item) {
         openItem.classList.remove('open');
@@ -1167,16 +1099,8 @@ contactForm.addEventListener('submit', e => {
 
 
 // ORDER TRACKING
-//
-// NOTE: This is a static demo site with no backend, so order status is
-// simulated client-side based on elapsed time since the order was placed
-// (using short demo timings rather than real kitchen/delivery timings).
-// Orders are persisted to localStorage so an order ID can be looked up
-// again later, including after a page refresh.
-
 const ORDERS_KEY = 'sweetbite_orders';
 
-// Simulated stage timings (ms elapsed since order placed)
 const TRACK_STAGE_KEYS = ['confirmed', 'baking', 'delivery', 'delivered'];
 const TRACK_STAGE_THRESHOLDS = [0, 30 * 1000, 90 * 1000, 180 * 1000];
 const TRACK_STAGE_MESSAGES = [
@@ -1232,7 +1156,6 @@ function formatOrderDate(dateStr) {
   return d.toLocaleDateString('en-KE', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// --- Tracker modal elements ---
 const trackOverlay     = document.getElementById('track-overlay');
 const trackStepLookup  = document.getElementById('track-step-lookup');
 const trackStepResult  = document.getElementById('track-step-result');
@@ -1315,7 +1238,6 @@ function lookupOrder(idStr) {
   startTrackerPolling(order);
 }
 
-// --- Tracker modal events ---
 navTrackLink.addEventListener('click', (e) => {
   e.preventDefault();
   setHamburgerOpen(false);
@@ -1348,8 +1270,6 @@ document.getElementById('track-another-btn').addEventListener('click', () => {
 
 
 // NEWSLETTER / DISCOUNT POPUP
-// Shows once per browser (localStorage-gated) offering the existing
-// WELCOME10 coupon in exchange for an email signup.
 const NEWSLETTER_SEEN_KEY = 'sweetbite_newsletter_seen';
 const NEWSLETTER_DELAY_MS = 6000;
 const NEWSLETTER_CODE     = 'WELCOME10';
@@ -1367,7 +1287,7 @@ function hasSeenNewsletterPopup() {
   try {
     return localStorage.getItem(NEWSLETTER_SEEN_KEY) === '1';
   } catch {
-    return true; // if storage is unavailable, don't keep trying to show it
+    return true;
   }
 }
 
@@ -1375,7 +1295,6 @@ function markNewsletterPopupSeen() {
   try {
     localStorage.setItem(NEWSLETTER_SEEN_KEY, '1');
   } catch {
-    // Storage unavailable — fine, it just may show again next visit.
   }
 }
 
@@ -1464,3 +1383,110 @@ newsletterCopyBtn.addEventListener('click', () => {
 document.getElementById('newsletter-done-btn').addEventListener('click', () => {
   closeNewsletterPopup();
 });
+
+
+// DYNAMIC CAKE RENDERING — fetches the live menu from the backend API
+// instead of relying on the hardcoded cards that used to sit in index.html.
+//
+// Change API_BASE to your deployed backend URL once sweetbite-api is
+// hosted somewhere other than your own machine (Render/Railway/etc).
+const API_BASE = 'http://localhost:4000/api';
+
+const pricingContainer = document.querySelector('.pricing-container');
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+function buildCakeCardHTML(cake) {
+  const images = [cake.imageUrl, ...(cake.galleryUrls || [])].filter(Boolean);
+  const badgeHTML = cake.badge === 'popular'
+    ? '<span class="badge popular">Popular</span>'
+    : cake.badge === 'new'
+      ? '<span class="badge new-badge">New</span>'
+      : '';
+
+  return `
+    <div class="price-card" data-tag="${escapeHtml(cake.tag)}" data-images="${escapeHtml(images.join(','))}" data-full-desc="${escapeHtml(cake.fullDesc)}">
+      <div class="card-img-wrap">
+        ${badgeHTML}
+        <span class="card-view-hint">🔍 Quick view</span>
+        <img src="${escapeHtml(cake.imageUrl)}" width="600" height="450" alt="${escapeHtml(cake.name)}">
+      </div>
+      <div class="card-body">
+        <span class="cake-tag">${escapeHtml(cake.tag)}</span>
+        <h3>${escapeHtml(cake.name)}</h3>
+        <p class="cake-desc">${escapeHtml(cake.shortDesc)}</p>
+        <div class="card-footer">
+          <span class="cake-price">${formatKES(cake.price)}</span>
+          <div class="card-footer-actions">
+            <button class="quick-add-btn" data-name="${escapeHtml(cake.name)}" data-price="${cake.price}" aria-label="Add ${escapeHtml(cake.name)} to cart">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.6 12.6a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21.5 7H6"/><line x1="12" y1="8" x2="12" y2="14"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+            </button>
+            <button class="order-btn" data-name="${escapeHtml(cake.name)}" data-price="${cake.price}">Order Now</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+async function loadCakes() {
+  pricingContainer.innerHTML = '<p class="cake-filter-empty">Loading our cake collection…</p>';
+
+  try {
+    const res = await fetch(`${API_BASE}/cakes`);
+    if (!res.ok) throw new Error(`API returned ${res.status}`);
+    const data = await res.json();
+    const cakes = data.cakes || [];
+
+    if (cakes.length === 0) {
+      pricingContainer.innerHTML = '<p class="cake-filter-empty">No cakes available right now — check back soon!</p>';
+      return;
+    }
+
+    pricingContainer.innerHTML = cakes.map(buildCakeCardHTML).join('');
+
+    // Newly-created cards need their own scroll-reveal observation and
+    // need to respect whatever filter tab is currently selected.
+    pricingContainer.querySelectorAll('.price-card').forEach(card => revealObserver.observe(card));
+    applyCakeFilter();
+  } catch (err) {
+    console.error('Failed to load cakes:', err);
+    pricingContainer.innerHTML = `
+      <p class="cake-filter-empty">
+        Couldn't load the cake menu right now. Make sure the backend server is running
+        (npm run dev in sweetbite-api), then refresh this page.
+      </p>`;
+  }
+}
+
+// Event delegation for card interactions — one listener on the container
+// instead of per-card listeners, since cards are now created dynamically
+// after the API responds rather than existing at page-load time.
+pricingContainer.addEventListener('click', (e) => {
+  const orderBtn = e.target.closest('.order-btn');
+  if (orderBtn) {
+    e.stopPropagation();
+    openModal(orderBtn.dataset.name, parseInt(orderBtn.dataset.price));
+    return;
+  }
+
+  const quickAddBtn = e.target.closest('.quick-add-btn');
+  if (quickAddBtn) {
+    e.stopPropagation();
+    const name = quickAddBtn.dataset.name;
+    const price = parseInt(quickAddBtn.dataset.price);
+    addToCart(name, price);
+    showToast(`🛒 Added ${name} to cart`);
+    return;
+  }
+
+  const card = e.target.closest('.price-card');
+  if (card) {
+    openQuickview(card);
+  }
+});
+
+loadCakes();
