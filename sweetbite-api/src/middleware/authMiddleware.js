@@ -17,4 +17,20 @@ function requireAuth(req, res, next) {
   }
 }
 
-module.exports = { requireAuth };
+function optionalAuth(req, res, next) {
+  const header = req.headers.authorization || '';
+  const [scheme, token] = header.split(' ');
+
+  if (scheme === 'Bearer' && token) {
+    try {
+      const payload = verifyToken(token);
+      req.userId = payload.sub;
+    } catch (err) {
+      // Ignore — proceed as a guest request.
+    }
+  }
+
+  next();
+}
+
+module.exports = { requireAuth, optionalAuth };

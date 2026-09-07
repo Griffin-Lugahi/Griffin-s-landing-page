@@ -50,3 +50,31 @@ CREATE TRIGGER trg_cakes_updated_at
   BEFORE UPDATE ON cakes
   FOR EACH ROW
   EXECUTE FUNCTION set_updated_at();
+
+CREATE TABLE IF NOT EXISTS orders (
+  id                SERIAL PRIMARY KEY,
+  user_id           INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  cake_id           INTEGER REFERENCES cakes(id) ON DELETE SET NULL,
+  cake_name         VARCHAR(120) NOT NULL,
+  size              VARCHAR(20) NOT NULL,
+  frosting          VARCHAR(40) NOT NULL,
+  price             INTEGER NOT NULL CHECK (price >= 0),
+  customer_name     VARCHAR(120) NOT NULL,
+  customer_phone    VARCHAR(30) NOT NULL,
+  delivery_address  TEXT NOT NULL,
+  delivery_date     DATE NOT NULL,
+  notes             TEXT,
+  status            VARCHAR(20) NOT NULL DEFAULT 'confirmed'
+                      CHECK (status IN ('confirmed', 'baking', 'delivery', 'delivered', 'cancelled')),
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_orders_user ON orders (user_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders (status);
+
+DROP TRIGGER IF EXISTS trg_orders_updated_at ON orders;
+CREATE TRIGGER trg_orders_updated_at
+  BEFORE UPDATE ON orders
+  FOR EACH ROW
+  EXECUTE FUNCTION set_updated_at();
