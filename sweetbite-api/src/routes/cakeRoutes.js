@@ -3,7 +3,7 @@ const { body } = require('express-validator');
 
 const cakeController = require('../controllers/cakeController');
 const validate = require('../middleware/validate');
-const { requireAuth } = require('../middleware/authMiddleware');
+const { requireAuth, requireAdmin } = require('../middleware/authMiddleware');
 const asyncHandler = require('../utils/asyncHandler');
 
 const router = Router();
@@ -39,8 +39,8 @@ const updateValidators = [
 router.get('/', asyncHandler(cakeController.listCakes));
 router.get('/:id', asyncHandler(cakeController.getCake));
 
-router.post('/', requireAuth, createValidators, validate, asyncHandler(cakeController.createCake));
-router.patch('/:id', requireAuth, updateValidators, validate, asyncHandler(cakeController.updateCake));
-router.delete('/:id', requireAuth, asyncHandler(cakeController.deleteCake));
+router.post('/', requireAuth, requireAdmin, createValidators, validate, asyncHandler(cakeController.createCake));
+router.patch('/:id', requireAuth, requireAdmin, updateValidators, validate, asyncHandler(cakeController.updateCake));
+router.delete('/:id', requireAuth, requireAdmin, asyncHandler(cakeController.deleteCake));
 
 module.exports = router;

@@ -3,7 +3,7 @@ const { body } = require('express-validator');
 
 const orderController = require('../controllers/orderController');
 const validate = require('../middleware/validate');
-const { requireAuth, optionalAuth } = require('../middleware/authMiddleware');
+const { requireAuth, optionalAuth, requireAdmin } = require('../middleware/authMiddleware');
 const asyncHandler = require('../utils/asyncHandler');
 
 const router = Router();
@@ -31,7 +31,7 @@ router.post('/', optionalAuth, createValidators, validate, asyncHandler(orderCon
 
 router.get('/:orderNumber', asyncHandler(orderController.getOrder));
 
-router.get('/', requireAuth, asyncHandler(orderController.listOrders));
-router.patch('/:orderNumber/status', requireAuth, statusValidators, validate, asyncHandler(orderController.updateOrderStatus));
+router.get('/', requireAuth, requireAdmin, asyncHandler(orderController.listOrders));
+router.patch('/:orderNumber/status', requireAuth, requireAdmin, statusValidators, validate, asyncHandler(orderController.updateOrderStatus));
 
 module.exports = router;
