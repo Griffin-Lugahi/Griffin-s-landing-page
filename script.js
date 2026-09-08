@@ -257,10 +257,11 @@ const step2       = document.getElementById('modal-step-2');
 const modalTitle  = document.getElementById('modal-title');
 const modalPrice  = document.getElementById('modal-price');
 const modalBadge  = document.getElementById('modal-badge');
+const modalSubmitBtn = document.getElementById('modal-submit');
 
 const cart = {};
-let pendingItem = null;
-let lastOrder = null;
+let pendingItem = null; // { name, price, cakeId }
+let lastOrder = null;   // the order object as returned by the API
 let appliedCoupon = null;
 let appliedDeliveryZone = null;
 
@@ -328,6 +329,10 @@ const frostingOptionsEl = document.getElementById('frosting-options');
 let selectedSize     = 'Medium';
 let selectedFrosting = 'Buttercream';
 
+// Client-side price preview only — shown in the modal while the person is
+// still choosing options. The backend recomputes this same formula itself
+// and that server-side number is the one actually charged/stored; this
+// local copy just avoids a network round trip on every pill click.
 function computeCurrentPrice() {
   if (!pendingItem) return 0;
   const sizeMult    = CAKE_SIZE_MULTIPLIERS[selectedSize] ?? 1;
@@ -363,8 +368,8 @@ frostingOptionsEl.addEventListener('click', (e) => {
   updateModalPrice();
 });
 
-function openModal(name, price) {
-  pendingItem = { name, price };
+function openModal(name, price, cakeId) {
+  pendingItem = { name, price, cakeId };
   modalTitle.textContent  = name;
   selectedSize     = 'Medium';
   selectedFrosting = 'Buttercream';
@@ -442,7 +447,7 @@ const quickviewNext     = document.getElementById('quickview-next');
 
 let quickviewImages = [];
 let quickviewIndex  = 0;
-let quickviewItem   = null;
+let quickviewItem   = null; // { name, price, cakeId }
 
 function renderQuickviewImage() {
   quickviewImg.src = quickviewImages[quickviewIndex];
@@ -471,7 +476,9 @@ function getInitials(fullName) {
 
 function openQuickview(card) {
   const name     = card.querySelector('h3').textContent.trim();
-  const price    = parseInt(card.querySelector('.order-btn').dataset.price);
+  const orderBtnEl = card.querySelector('.order-btn');
+  const price    = parseInt(orderBtnEl.dataset.price);
+  const cakeId   = orderBtnEl.dataset.id ? parseInt(orderBtnEl.dataset.id) : null;
   const tag      = card.querySelector('.cake-tag')?.textContent.trim() || '';
   const fullDesc = card.dataset.fullDesc || card.querySelector('.cake-desc')?.textContent.trim() || '';
   quickviewImages = (card.dataset.images || '').split(',').filter(Boolean);
@@ -480,7 +487,7 @@ function openQuickview(card) {
     if (fallbackImg) quickviewImages = [fallbackImg.src];
   }
   quickviewIndex = 0;
-  quickviewItem  = { name, price };
+  quickviewItem  = { name, price, cakeId };
 
   quickviewTag.textContent   = tag;
   quickviewTitle.textContent = name;
@@ -540,10 +547,14 @@ quickviewAddCart.addEventListener('click', () => {
 quickviewOrderNow.addEventListener('click', () => {
   if (!quickviewItem) return;
   closeQuickview();
-  openModal(quickviewItem.name, quickviewItem.price);
+  openModal(quickviewItem.name, quickviewItem.price, quickviewItem.cakeId);
 });
 
 // --- Cart dropdown rendering & cart state helpers ---
+// NOTE: the cart/WhatsApp-checkout flow below is unchanged and still
+// separate from the real order API — it's the "bundle several cakes into
+// one WhatsApp message" path. The order MODAL (single-cake, with delivery
+// details) is the flow now wired to POST /api/orders, below.
 
 function cartItemCount() {
   return Object.values(cart).reduce((s, i) => s + i.qty, 0);
@@ -800,64 +811,81 @@ cartCheckoutBtn.addEventListener('click', () => {
   window.open(url, '_blank');
 });
 
-document.getElementById('modal-submit').addEventListener('click', () => {
+// SUBMIT ORDER — calls the real backend instead of writing to localStorage.
+modalSubmitBtn.addEventListener('click', async () => {
   if (!validateForm()) return;
+  if (!pendingItem || !pendingItem.cakeId) {
+    showToast('⚠️ Something went wrong — please close this and try again.', 'error');
+    return;
+  }
 
   const name      = document.getElementById('order-name').value.trim();
   const phone     = document.getElementById('order-phone').value.trim();
   const address   = document.getElementById('order-address').value.trim();
   const dateInput = document.getElementById('order-date').value;
-  const date      = new Date(dateInput + 'T00:00:00');
   const notes     = document.getElementById('order-notes').value.trim();
-  const dateStr   = date.toLocaleDateString('en-KE', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  const { name: baseCakeName } = pendingItem;
-  const price = computeCurrentPrice();
-  const isDefaultOptions = selectedSize === 'Medium' && selectedFrosting === 'Buttercream';
-  const variantSuffix = isDefaultOptions
-    ? ''
-    : ` (${selectedSize}${selectedFrosting !== 'Buttercream' ? ', ' + selectedFrosting : ''})`;
-  const itemName = `${baseCakeName}${variantSuffix}`;
-  addToCart(itemName, price);
+  const originalBtnText = modalSubmitBtn.textContent;
+  modalSubmitBtn.disabled = true;
+  modalSubmitBtn.textContent = 'Placing order…';
 
-  const orderId = generateOrderId();
-  lastOrder = {
-    id: orderId,
-    cake: itemName,
-    price,
-    size: selectedSize,
-    frosting: selectedFrosting,
-    name,
-    phone,
-    address,
-    notes,
-    date: dateInput,
-    placedAt: Date.now(),
-  };
-  addOrderRecord(lastOrder);
+  try {
+    const res = await fetch(`${API_BASE}/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cakeId: pendingItem.cakeId,
+        size: selectedSize,
+        frosting: selectedFrosting,
+        customerName: name,
+        customerPhone: phone,
+        deliveryAddress: address,
+        deliveryDate: dateInput,
+        notes: notes || undefined,
+      }),
+    });
 
-  document.getElementById('confirm-order-id').textContent = orderId;
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `The order couldn't be placed (${res.status}).`);
+    }
 
-  const rows = [
-    ['Cake',     baseCakeName],
-    ['Size',     `${selectedSize} (${CAKE_SIZE_SERVINGS[selectedSize]})`],
-    ['Frosting', selectedFrosting],
-    ['Price',    formatKES(price)],
-    ['Name',     name],
-    ['Phone',    phone],
-    ['Delivery', address],
-    ['Date',     dateStr],
-  ];
-  if (notes) rows.push(['Notes', notes]);
+    const data = await res.json();
+    lastOrder = data.order;
 
-  document.getElementById('confirm-details').innerHTML = rows
-    .map(([k, v]) => `<div class="confirm-row"><span>${k}</span><span>${v}</span></div>`)
-    .join('');
+    // Also add to the WhatsApp-bundle cart, same as before, so the
+    // existing "Order via WhatsApp" cart flow still reflects this cake.
+    addToCart(lastOrder.cakeName, lastOrder.price);
 
-  sendOrderWhatsAppConfirmation(lastOrder);
+    document.getElementById('confirm-order-id').textContent = lastOrder.orderNumber;
 
-  step1.classList.add('hidden');
-  step2.classList.remove('hidden');
+    const rows = [
+      ['Cake',     lastOrder.cakeName],
+      ['Size',     `${lastOrder.size} (${CAKE_SIZE_SERVINGS[lastOrder.size] || ''})`],
+      ['Frosting', lastOrder.frosting],
+      ['Price',    formatKES(lastOrder.price)],
+      ['Name',     lastOrder.customerName],
+      ['Phone',    lastOrder.customerPhone],
+      ['Delivery', lastOrder.deliveryAddress],
+      ['Date',     formatOrderDate(lastOrder.deliveryDate)],
+    ];
+    if (lastOrder.notes) rows.push(['Notes', lastOrder.notes]);
+
+    document.getElementById('confirm-details').innerHTML = rows
+      .map(([k, v]) => `<div class="confirm-row"><span>${k}</span><span>${v}</span></div>`)
+      .join('');
+
+    sendOrderWhatsAppConfirmation(lastOrder);
+
+    step1.classList.add('hidden');
+    step2.classList.remove('hidden');
+  } catch (err) {
+    console.error('Order submission failed:', err);
+    showToast(`⚠️ ${err.message || 'Could not place the order. Please try again.'}`, 'error');
+  } finally {
+    modalSubmitBtn.disabled = false;
+    modalSubmitBtn.textContent = originalBtnText;
+  }
 });
 
 document.getElementById('modal-close').addEventListener('click', closeModal);
@@ -872,8 +900,8 @@ document.getElementById('modal-track-btn').addEventListener('click', () => {
   closeModal();
   if (lastOrder) {
     openTrackModal();
-    document.getElementById('track-order-id').value = lastOrder.id;
-    lookupOrder(lastOrder.id);
+    document.getElementById('track-order-id').value = lastOrder.orderNumber;
+    lookupOrder(lastOrder.orderNumber);
   }
 });
 overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
@@ -931,20 +959,21 @@ function buildWhatsAppMessage() {
   return msg;
 }
 
+// Builds the WhatsApp confirmation message from a real API order object
+// (orderNumber/cakeName/customerName/... field names, not the old
+// localStorage shape).
 function buildOrderWhatsAppMessage(order) {
-  const dateStr = order.date
-    ? new Date(order.date + 'T00:00:00').toLocaleDateString('en-KE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-    : 'N/A';
+  const dateStr = formatOrderDate(order.deliveryDate);
 
   let msg = "Hi SweetBite! I just placed an order — please confirm:\n\n";
-  msg += `Order ID: ${order.id}\n`;
-  msg += `Cake: ${order.cake}\n`;
+  msg += `Order ID: ${order.orderNumber}\n`;
+  msg += `Cake: ${order.cakeName}\n`;
   if (order.size)     msg += `Size: ${order.size} (${CAKE_SIZE_SERVINGS[order.size] || ''})\n`;
   if (order.frosting) msg += `Frosting: ${order.frosting}\n`;
   msg += `Price: ${formatKES(order.price)}\n`;
-  msg += `Name: ${order.name}\n`;
-  msg += `Phone: ${order.phone}\n`;
-  msg += `Delivery: ${order.address}\n`;
+  msg += `Name: ${order.customerName}\n`;
+  msg += `Phone: ${order.customerPhone}\n`;
+  msg += `Delivery: ${order.deliveryAddress}\n`;
   msg += `Date: ${dateStr}\n`;
   if (order.notes) msg += `Notes: ${order.notes}\n`;
   msg += "\nLooking forward to your confirmation. Thank you!";
@@ -1098,61 +1127,27 @@ contactForm.addEventListener('submit', e => {
 });
 
 
-// ORDER TRACKING
-const ORDERS_KEY = 'sweetbite_orders';
-
+// ORDER TRACKING — now backed by GET /api/orders/:orderNumber instead of
+// a localStorage-simulated timer. Polling re-fetches so a status change
+// made elsewhere (e.g. a future staff dashboard calling the PATCH status
+// endpoint) shows up here without the customer needing to refresh.
 const TRACK_STAGE_KEYS = ['confirmed', 'baking', 'delivery', 'delivered'];
-const TRACK_STAGE_THRESHOLDS = [0, 30 * 1000, 90 * 1000, 180 * 1000];
-const TRACK_STAGE_MESSAGES = [
-  "Your order has been confirmed — we'll start baking soon! 📝",
-  "Good news — your cake is in the oven right now! 🧁",
-  "Your cake is out for delivery and on its way! 🚚",
-  "Delivered! We hope you enjoy every bite. 🎉",
-];
+const TRACK_STAGE_MESSAGES = {
+  confirmed: "Your order has been confirmed — we'll start baking soon! 📝",
+  baking: "Good news — your cake is in the oven right now! 🧁",
+  delivery: "Your cake is out for delivery and on its way! 🚚",
+  delivered: "Delivered! We hope you enjoy every bite. 🎉",
+  cancelled: "This order has been cancelled. Contact us on WhatsApp if that's unexpected.",
+};
+const TRACK_POLL_INTERVAL_MS = 8000;
 
-function getOrders() {
-  try {
-    return JSON.parse(localStorage.getItem(ORDERS_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveOrders(orders) {
-  localStorage.setItem(ORDERS_KEY, JSON.stringify(orders.slice(0, 20)));
-}
-
-function generateOrderId() {
-  const existing = new Set(getOrders().map(o => o.id));
-  let id;
-  do {
-    id = 'SB-' + (1000 + Math.floor(Math.random() * 9000));
-  } while (existing.has(id));
-  return id;
-}
-
-function addOrderRecord(order) {
-  const orders = getOrders();
-  orders.unshift(order);
-  saveOrders(orders);
-}
-
-function findOrder(idStr) {
-  const id = idStr.trim().toUpperCase();
-  if (!id) return null;
-  return getOrders().find(o => o.id.toUpperCase() === id) || null;
-}
-
-function getStageIndex(order) {
-  const elapsed = Date.now() - order.placedAt;
-  let idx = 0;
-  TRACK_STAGE_THRESHOLDS.forEach((t, i) => { if (elapsed >= t) idx = i; });
-  return idx;
-}
-
+// A plain 'YYYY-MM-DD' string (or one with a time part attached) is
+// parsed at local midnight explicitly, avoiding the timezone pitfalls
+// that come from letting the Date constructor interpret it as UTC.
 function formatOrderDate(dateStr) {
   if (!dateStr) return '';
-  const d = new Date(dateStr + 'T00:00:00');
+  const datePart = dateStr.split('T')[0];
+  const d = new Date(datePart + 'T00:00:00');
   return d.toLocaleDateString('en-KE', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
 }
 
@@ -1163,6 +1158,7 @@ const trackInput       = document.getElementById('track-order-id');
 const trackErrorEl     = document.getElementById('err-track-order-id');
 const navTrackLink     = document.getElementById('nav-track-link');
 let trackerPollInterval = null;
+let trackedOrderNumber  = null;
 
 function openTrackModal() {
   trackOverlay.classList.add('open');
@@ -1180,42 +1176,60 @@ function closeTrackModal() {
   trackOverlay.classList.remove('open');
   clearInterval(trackerPollInterval);
   trackerPollInterval = null;
+  trackedOrderNumber = null;
   popFocusTrap();
 }
 
 function renderTracker(order) {
-  const stageIndex = getStageIndex(order);
-
-  document.getElementById('track-result-id').textContent = order.id;
-  document.getElementById('track-result-cake').textContent = order.cake;
-  document.getElementById('track-result-eta').textContent = order.date
-    ? `Expected delivery: ${formatOrderDate(order.date)}`
+  document.getElementById('track-result-id').textContent = order.orderNumber;
+  document.getElementById('track-result-cake').textContent = order.cakeName;
+  document.getElementById('track-result-eta').textContent = order.deliveryDate
+    ? `Expected delivery: ${formatOrderDate(order.deliveryDate)}`
     : '';
 
+  const stageIndex = TRACK_STAGE_KEYS.indexOf(order.status);
   const steps = trackStepResult.querySelectorAll('.tracker-step');
-  steps.forEach((stepEl, i) => {
-    stepEl.classList.remove('completed', 'active');
-    if (i < stageIndex) stepEl.classList.add('completed');
-    else if (i === stageIndex) stepEl.classList.add('active');
-  });
-
   const lines = trackStepResult.querySelectorAll('.tracker-line');
-  lines.forEach((lineEl, i) => {
-    lineEl.classList.toggle('completed', i < stageIndex);
-  });
 
-  document.getElementById('tracker-message').textContent = TRACK_STAGE_MESSAGES[stageIndex];
+  if (order.status === 'cancelled') {
+    // Nothing reads as "in progress" for a cancelled order — clear every
+    // step rather than implying it's still confirmed/baking/etc.
+    steps.forEach(stepEl => stepEl.classList.remove('completed', 'active'));
+    lines.forEach(lineEl => lineEl.classList.remove('completed'));
+  } else {
+    steps.forEach((stepEl, i) => {
+      stepEl.classList.remove('completed', 'active');
+      if (i < stageIndex) stepEl.classList.add('completed');
+      else if (i === stageIndex) stepEl.classList.add('active');
+    });
+    lines.forEach((lineEl, i) => {
+      lineEl.classList.toggle('completed', i < stageIndex);
+    });
+  }
+
+  document.getElementById('tracker-message').textContent =
+    TRACK_STAGE_MESSAGES[order.status] || 'Checking your order status…';
 
   trackStepLookup.classList.add('hidden');
   trackStepResult.classList.remove('hidden');
 }
 
-function startTrackerPolling(order) {
+function startTrackerPolling(orderNumber) {
   clearInterval(trackerPollInterval);
-  trackerPollInterval = setInterval(() => renderTracker(order), 5000);
+  trackedOrderNumber = orderNumber;
+  trackerPollInterval = setInterval(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/orders/${encodeURIComponent(orderNumber)}`);
+      if (!res.ok) return; // order was removed or a transient error — just skip this tick
+      const data = await res.json();
+      if (trackedOrderNumber === orderNumber) renderTracker(data.order);
+    } catch {
+      // Network hiccup — try again on the next tick rather than surfacing an error.
+    }
+  }, TRACK_POLL_INTERVAL_MS);
 }
 
-function lookupOrder(idStr) {
+async function lookupOrder(idStr) {
   trackErrorEl.textContent = '';
   trackInput.classList.remove('invalid');
 
@@ -1226,16 +1240,22 @@ function lookupOrder(idStr) {
     return;
   }
 
-  const order = findOrder(id);
-  if (!order) {
-    trackErrorEl.textContent = 'No order found with that ID.';
+  try {
+    const res = await fetch(`${API_BASE}/orders/${encodeURIComponent(id)}`);
+    if (!res.ok) {
+      trackErrorEl.textContent = 'No order found with that ID.';
+      trackInput.classList.add('invalid');
+      showToast('⚠️ Order not found.', 'error');
+      return;
+    }
+    const data = await res.json();
+    renderTracker(data.order);
+    startTrackerPolling(data.order.orderNumber);
+  } catch (err) {
+    console.error('Order lookup failed:', err);
+    trackErrorEl.textContent = "Couldn't check that order right now — try again in a moment.";
     trackInput.classList.add('invalid');
-    showToast('⚠️ Order not found.', 'error');
-    return;
   }
-
-  renderTracker(order);
-  startTrackerPolling(order);
 }
 
 navTrackLink.addEventListener('click', (e) => {
@@ -1260,6 +1280,7 @@ trackInput.addEventListener('keydown', e => {
 
 document.getElementById('track-another-btn').addEventListener('click', () => {
   clearInterval(trackerPollInterval);
+  trackedOrderNumber = null;
   trackStepResult.classList.add('hidden');
   trackStepLookup.classList.remove('hidden');
   trackInput.value = '';
@@ -1386,7 +1407,7 @@ document.getElementById('newsletter-done-btn').addEventListener('click', () => {
 
 
 // DYNAMIC CAKE RENDERING — fetches the live menu from the backend API
-// instead of relying on the hardcoded cards that used to sit in index.html.
+// instead of relying on hardcoded cards.
 //
 // Change API_BASE to your deployed backend URL once sweetbite-api is
 // hosted somewhere other than your own machine (Render/Railway/etc).
@@ -1422,10 +1443,10 @@ function buildCakeCardHTML(cake) {
         <div class="card-footer">
           <span class="cake-price">${formatKES(cake.price)}</span>
           <div class="card-footer-actions">
-            <button class="quick-add-btn" data-name="${escapeHtml(cake.name)}" data-price="${cake.price}" aria-label="Add ${escapeHtml(cake.name)} to cart">
+            <button class="quick-add-btn" data-name="${escapeHtml(cake.name)}" data-price="${cake.price}" data-id="${cake.id}" aria-label="Add ${escapeHtml(cake.name)} to cart">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.5 3h2l2.6 12.6a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21.5 7H6"/><line x1="12" y1="8" x2="12" y2="14"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
             </button>
-            <button class="order-btn" data-name="${escapeHtml(cake.name)}" data-price="${cake.price}">Order Now</button>
+            <button class="order-btn" data-name="${escapeHtml(cake.name)}" data-price="${cake.price}" data-id="${cake.id}">Order Now</button>
           </div>
         </div>
       </div>
@@ -1448,8 +1469,6 @@ async function loadCakes() {
 
     pricingContainer.innerHTML = cakes.map(buildCakeCardHTML).join('');
 
-    // Newly-created cards need their own scroll-reveal observation and
-    // need to respect whatever filter tab is currently selected.
     pricingContainer.querySelectorAll('.price-card').forEach(card => revealObserver.observe(card));
     applyCakeFilter();
   } catch (err) {
@@ -1462,14 +1481,12 @@ async function loadCakes() {
   }
 }
 
-// Event delegation for card interactions — one listener on the container
-// instead of per-card listeners, since cards are now created dynamically
-// after the API responds rather than existing at page-load time.
 pricingContainer.addEventListener('click', (e) => {
   const orderBtn = e.target.closest('.order-btn');
   if (orderBtn) {
     e.stopPropagation();
-    openModal(orderBtn.dataset.name, parseInt(orderBtn.dataset.price));
+    const cakeId = orderBtn.dataset.id ? parseInt(orderBtn.dataset.id) : null;
+    openModal(orderBtn.dataset.name, parseInt(orderBtn.dataset.price), cakeId);
     return;
   }
 
