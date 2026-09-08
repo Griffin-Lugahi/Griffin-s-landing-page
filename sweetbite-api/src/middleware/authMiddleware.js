@@ -1,4 +1,5 @@
 const { verifyToken } = require('../utils/jwt');
+const pool = require('../config/db');
 
 function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
@@ -33,4 +34,18 @@ function optionalAuth(req, res, next) {
   next();
 }
 
-module.exports = { requireAuth, optionalAuth };
+async function requireAdmin(req, res, next) {
+  try {
+    const result = await pool.query('SELECT role FROM users WHERE id = $1', [req.userId]);
+    const user = result.rows[0];
+
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required.' });
+    }
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { requireAuth, optionalAuth, requireAdmin };

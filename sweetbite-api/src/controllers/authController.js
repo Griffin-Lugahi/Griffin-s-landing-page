@@ -4,13 +4,13 @@ const { signToken } = require('../utils/jwt');
 
 const SALT_ROUNDS = 10;
 
-// Never send password_hash back to the client.
 function toPublicUser(row) {
   return {
     id: row.id,
     name: row.name,
     email: row.email,
     phone: row.phone,
+    role: row.role,
     createdAt: row.created_at,
   };
 }
@@ -23,7 +23,7 @@ async function register(req, res) {
   const result = await pool.query(
     `INSERT INTO users (name, email, phone, password_hash)
      VALUES ($1, $2, $3, $4)
-     RETURNING id, name, email, phone, created_at`,
+     RETURNING id, name, email, phone, role, created_at`,
     [name, email.toLowerCase(), phone || null, passwordHash]
   );
 
@@ -37,15 +37,13 @@ async function login(req, res) {
   const { email, password } = req.body;
 
   const result = await pool.query(
-    `SELECT id, name, email, phone, password_hash, created_at
+    `SELECT id, name, email, phone, password_hash, role, created_at
      FROM users WHERE email = $1`,
     [email.toLowerCase()]
   );
 
   const user = result.rows[0];
 
-  // Same error for "no such user" and "wrong password" — don't leak
-  // which one it was, that's a free account-enumeration oracle otherwise.
   if (!user) {
     return res.status(401).json({ error: 'Invalid email or password.' });
   }
@@ -61,7 +59,7 @@ async function login(req, res) {
 
 async function getMe(req, res) {
   const result = await pool.query(
-    `SELECT id, name, email, phone, created_at FROM users WHERE id = $1`,
+    `SELECT id, name, email, phone, role, created_at FROM users WHERE id = $1`,
     [req.userId]
   );
 
@@ -80,7 +78,7 @@ async function updateMe(req, res) {
     `UPDATE users
      SET name = COALESCE($1, name), phone = COALESCE($2, phone)
      WHERE id = $3
-     RETURNING id, name, email, phone, created_at`,
+     RETURNING id, name, email, phone, role, created_at`,
     [name || null, phone || null, req.userId]
   );
 
